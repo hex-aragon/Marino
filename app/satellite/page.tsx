@@ -37,7 +37,8 @@ interface AreaCardProps {
 }
 
 function AreaCard({ area, weather }: AreaCardProps) {
-  const portName = area === 'busan' ? 'Busan Port' : 'Incheon Port';
+  const { getPort } = require('@/lib/ports');
+  const portName = getPort(area)?.label || 'Port';
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -82,9 +83,9 @@ function AreaCard({ area, weather }: AreaCardProps) {
 }
 
 export default function SatellitePage() {
-  const busan = useShips();
-  const busanWeather = useWeather('busan');
-  const incheonWeather = useWeather('incheon');
+  const sg = useShips('singapore');
+  const sgWeather = useWeather('singapore');
+  const rotWeather = useWeather('rotterdam');
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -98,10 +99,10 @@ export default function SatellitePage() {
 
       <main className="mx-auto w-full max-w-6xl space-y-10 px-4 py-8">
         <section>
-          <h2 className="mb-4 text-xl font-semibold">🌊 Korean Maritime Conditions</h2>
+          <h2 className="mb-4 text-xl font-semibold">🌊 Global Maritime Conditions</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            <AreaCard area="busan" weather={busanWeather.weather} />
-            <AreaCard area="incheon" weather={incheonWeather.weather} />
+            <AreaCard area="singapore" weather={sgWeather.weather} />
+            <AreaCard area="rotterdam" weather={rotWeather.weather} />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             Source: Open-Meteo Marine API · Refreshed hourly
@@ -112,11 +113,11 @@ export default function SatellitePage() {
           <h2 className="mb-4 text-xl font-semibold">🗺️ Vessel Density Heatmap</h2>
           <div className="h-[500px] overflow-hidden rounded-xl border">
             <MaritimeMap
-              ships={busan.ships}
+              ships={sg.ships}
               alerts={[]}
-              weather={busanWeather.weather}
-              area={busan.area}
-              onAreaChange={busan.setArea}
+              weather={sgWeather.weather}
+              area={sg.area}
+              onAreaChange={sg.setArea}
             />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">

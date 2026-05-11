@@ -10,10 +10,10 @@ function recentDate(daysAgo = 3) {
 }
 
 const GIBS_SNAPSHOT = (date: string) =>
-  `https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&LAYERS=MODIS_Aqua_CorrectedReflectance_TrueColor&CRS=EPSG:4326&BBOX=33,124,38.5,131&WIDTH=1200&HEIGHT=900&FORMAT=image/jpeg&TIME=${date}`;
+  `https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&LAYERS=MODIS_Aqua_CorrectedReflectance_TrueColor&CRS=EPSG:4326&BBOX=0,95,10,110&WIDTH=1200&HEIGHT=900&FORMAT=image/jpeg&TIME=${date}`;
 
 const WORLDVIEW_URL =
-  'https://worldview.earthdata.nasa.gov/?v=124.0,33.0,131.0,38.5&l=MODIS_Aqua_CorrectedReflectance_TrueColor';
+  'https://worldview.earthdata.nasa.gov/?v=95.0,0.0,110.0,10.0&l=MODIS_Aqua_CorrectedReflectance_TrueColor';
 
 const DATA_SOURCES = [
   {
@@ -67,14 +67,13 @@ export default function SatelliteViewer() {
         <div className="overflow-hidden rounded-xl border bg-card">
           <img
             src={GIBS_SNAPSHOT(date)}
-            alt={`NASA MODIS Aqua satellite imagery of Korean waters on ${date}`}
+            alt={`NASA MODIS Aqua satellite imagery of Strait of Malacca on ${date}`}
             className="h-[400px] w-full object-cover"
             loading="lazy"
           />
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          Source: NASA EOSDIS GIBS · MODIS Aqua True Color · {date} · Korean Peninsula waters (124°E
-          – 131°E, 33°N – 38.5°N)
+          Source: NASA EOSDIS GIBS · MODIS Aqua True Color · {date} · Strait of Malacca
         </p>
       </section>
 
