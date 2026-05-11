@@ -11,3 +11,5 @@ next-env.d.ts
 # Personal recording / submission notes (do not commit)
 DEMO_RECORDING.md
 FINAL_RECORDING_GUIDE.md
+*.mov
+*.mp4
