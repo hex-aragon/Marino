@@ -99,7 +99,7 @@ export default function LandingPage() {
       <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-4 backdrop-blur-sm">
         <Link href="/" className="flex items-center gap-2 text-base font-bold tracking-tight">
           <span className="text-xl">🚢</span>
-          <span>SeaWatch</span>
+          <span>Marino</span>
         </Link>
         <ConnectWalletButton />
       </header>
@@ -271,7 +271,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="border-t bg-background/80 py-8 text-center text-sm text-muted-foreground">
-        <p>SeaWatch © 2026 | Powered by Solana + Claude AI</p>
+        <p>Marino © 2026 | Powered by Solana + Claude AI</p>
         <div className="mt-2 flex items-center justify-center gap-4 text-xs">
           <Link href="/dashboard" className="hover:text-foreground">Dashboard</Link>
           <span className="text-border">·</span>

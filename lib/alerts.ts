@@ -1,8 +1,8 @@
 import { Resend } from 'resend';
 import type { AgentAlert } from '@/types';
 
-const ALERT_FROM = 'alerts@seawatch.dev';
-const ALERT_TO = process.env.ALERT_EMAIL_TO || 'alerts@seawatch.dev';
+const ALERT_FROM = 'alerts@marino.dev';
+const ALERT_TO = process.env.ALERT_EMAIL_TO || 'alerts@marino.dev';
 
 export async function sendHighAlertEmail(alert: AgentAlert): Promise<void> {
   const key = process.env.RESEND_API_KEY;
@@ -13,7 +13,7 @@ export async function sendHighAlertEmail(alert: AgentAlert): Promise<void> {
 
   try {
     const resend = new Resend(key);
-    const subject = `[SeaWatch HIGH] ${alert.shipname}`;
+    const subject = `[Marino HIGH] ${alert.shipname}`;
     const html = `
       <div style="font-family:system-ui,sans-serif;color:#0a1628;">
         <h2 style="color:#dc2626;margin:0 0 12px 0;">Maritime Risk Detected</h2>
@@ -26,7 +26,7 @@ export async function sendHighAlertEmail(alert: AgentAlert): Promise<void> {
           <tr><td style="padding:6px 12px;color:#64748b;">Recommended Action</td><td style="padding:6px 12px;">${alert.action}</td></tr>
           <tr><td style="padding:6px 12px;color:#64748b;">Detected At</td><td style="padding:6px 12px;">${alert.createdAt}</td></tr>
         </table>
-        <p style="margin-top:24px;color:#64748b;font-size:12px;">— SeaWatch AI Maritime Agent</p>
+        <p style="margin-top:24px;color:#64748b;font-size:12px;">— Marino AI Maritime Agent</p>
       </div>
     `;
 

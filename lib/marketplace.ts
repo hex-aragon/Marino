@@ -404,10 +404,10 @@ function seed(): Map<string, MarketItem> {
   return m;
 }
 
-if (!g.__seawatchItems__) {
-  g.__seawatchItems__ = seed();
+if (!g.__marinoItems__) {
+  g.__marinoItems__ = seed();
 }
-const items: Map<string, MarketItem> = g.__seawatchItems__;
+const items: Map<string, MarketItem> = g.__marinoItems__;
 
 export interface ListFilter {
   port?: string;

@@ -60,7 +60,7 @@ export function useAgent({ ships, weather, area }: UseAgentInput) {
       if (seenRef.current.has(key)) continue;
       seenRef.current.add(key);
       try {
-        new Notification(`[SeaWatch] ${a.shipname}`, {
+        new Notification(`[Marino] ${a.shipname}`, {
           body: a.message,
           tag: key,
         });

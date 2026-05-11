@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   if (meta.itemId) memoParts.push(`item=${meta.itemId}`);
   if (meta.plan) memoParts.push(`plan=${meta.plan}`);
   if (meta.email) memoParts.push(`email=${String(meta.email).slice(0, 40)}`);
-  const memo = `SeaWatch ${memoParts.join(' ')}`;
+  const memo = `Marino ${memoParts.join(' ')}`;
 
   const recipient = meta.sellerWallet || undefined;
   const payment = createSolanaPayQR(amount, memo, recipient);

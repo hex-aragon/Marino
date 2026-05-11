@@ -1,5 +1,6 @@
-# 🚢 SeaWatch — Maritime AI Agent Platform
+# 🚢 Marino — Maritime AI Agent Platform
 
+> **Marino** (Maritime + Node): A platform where every vessel becomes an intelligent node on the ocean, powered by AI and blockchain.
 > From any port in the world, AI agents monitor vessels, sailors and operators settle instantly in Solana USDC, and agents trade autonomously over x402 — a maritime-focused platform.
 
 Three core pillars:
@@ -72,4 +73,4 @@ vercel --prod
 
 ## License
 
-For demo / hackathon use. SeaWatch © 2026.
+For demo / hackathon use. Marino © 2026.

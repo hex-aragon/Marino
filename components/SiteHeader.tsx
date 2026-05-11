@@ -37,7 +37,7 @@ export default function SiteHeader({ rightSlot, hideWallet }: Props) {
             className="flex shrink-0 items-center gap-1.5 text-base font-bold tracking-tight"
           >
             <span className="text-xl">🚢</span>
-            <span className="hidden sm:inline">SeaWatch</span>
+            <span className="hidden sm:inline">Marino</span>
           </Link>
 
           <nav className="flex items-center gap-0.5 sm:gap-1">

@@ -12,8 +12,8 @@ interface AisState {
 }
 
 const g = globalThis as any;
-if (!g.__seawatchAis) {
-  g.__seawatchAis = {
+if (!g.__marinoAis) {
+  g.__marinoAis = {
     ws: null,
     store: new Map<string, ShipData>(),
     started: false,
@@ -21,7 +21,7 @@ if (!g.__seawatchAis) {
     snapshotTimer: null,
   } as AisState;
 }
-const state: AisState = g.__seawatchAis;
+const state: AisState = g.__marinoAis;
 
 function inBbox(lat: number, lon: number, bbox: [[number, number], [number, number]]): boolean {
   const [[minLat, minLon], [maxLat, maxLon]] = bbox;

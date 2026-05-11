@@ -3,10 +3,10 @@ import type { Escrow } from '@/types';
 import { loadFeePayer, transferUSDC } from '@/lib/solana';
 
 const g = globalThis as any;
-if (!g.__seawatchEscrows__) {
-  g.__seawatchEscrows__ = new Map<string, Escrow>();
+if (!g.__marinoEscrows__) {
+  g.__marinoEscrows__ = new Map<string, Escrow>();
 }
-const store: Map<string, Escrow> = g.__seawatchEscrows__;
+const store: Map<string, Escrow> = g.__marinoEscrows__;
 
 const PLATFORM_FEE_RATE = 0.01;
 

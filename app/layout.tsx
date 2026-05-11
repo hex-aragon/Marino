@@ -3,7 +3,7 @@ import './globals.css';
 import { WalletContextProvider } from '@/components/WalletContextProvider';
 
 export const metadata: Metadata = {
-  title: 'SeaWatch — Maritime AI Agent Platform',
+  title: 'Marino — Maritime AI Agent Platform',
   description: 'AI agents monitor vessels 24/7 with instant Solana USDC settlement.',
 };
 

@@ -1,11 +1,11 @@
-# SeaWatch Submission Guide
+# Marino Submission Guide
 
 ## 1. Vercel Deploy (Fastest Path)
 
 ### 1-1. Import Project on Vercel
 
 1. Go to https://vercel.com/new (sign in with GitHub)
-2. **Import Git Repository** → select `hex-aragon/seawatch`
+2. **Import Git Repository** → select `hex-aragon/marino`
 3. On the **Configure Project** screen:
    - Framework Preset: **Next.js** (auto-detected)
    - Root Directory: `./` (default)
@@ -35,7 +35,7 @@
 ### 1-3. Click Deploy
 
 - Takes 1–2 minutes
-- You'll receive a `https://seawatch-xxxx.vercel.app` URL
+- You'll receive a `https://marino-xxxx.vercel.app` URL
 - Paste this URL into the **"Live product link"** field on the Colosseum submission form
 
 ### 1-4. Add Vercel KV (Optional, for caching)
@@ -51,7 +51,7 @@ After deploy: Vercel Dashboard → Storage → Create Database → choose KV. En
 | Field | Value |
 |-------|-------|
 | **Project logo or graphic** | Upload `public/logo.png` (already 1024x1024 PNG) |
-| **GitHub link** | `https://github.com/hex-aragon/seawatch` |
+| **GitHub link** | `https://github.com/hex-aragon/marino` |
 | **GitHub repo context** | Copy text below ↓ |
 | **Product demo video** | Record on Loom, paste URL (script below) |
 | **Demo video visibility** | ✅ Public |
@@ -106,7 +106,7 @@ Notes:
 
 ```
 [0:00-0:10] 🎬 Intro
-"Hi, SeaWatch is a Solana-based maritime AI agent platform.
+"Hi, Marino is a Solana-based maritime AI agent platform.
 Let me show you three core features in 90 seconds."
 
 → Navigate to /dashboard
@@ -128,7 +128,7 @@ and only released once the sailor confirms delivery."
 → Navigate to /agent
 
 [1:00-1:30] 🤖 x402 (the key part)
-"This is what makes SeaWatch unique.
+"This is what makes Marino unique.
 Ask the AI agent for a 72-hour premium weather forecast and
 the agent hits a paid API → server returns 402 → agent autopays 2 USDC → data arrives.
 Zero human intervention. The agent works at 3 a.m. too."
@@ -146,7 +146,7 @@ All settled on Solana. Thank you."
 
 ```
 [0:00-0:15] 👋 Hello
-"Hi, I'm [your name], the builder of SeaWatch.
+"Hi, I'm [your name], the builder of Marino.
 My background: [one line — e.g., full-stack developer who grew up in Busan]."
 
 [0:15-0:45] 💔 Problem
@@ -156,7 +156,7 @@ Sailors in foreign ports sometimes can't even pay for a meal because their cards
 I wanted to fix this."
 
 [0:45-1:15] 💡 Solution
-"SeaWatch combines three things.
+"Marino combines three things.
 First, Claude AI monitors AIS data 24/7 and flags risk.
 Second, sailors trade P2P in USDC through an on-chain escrow market.
 Third — and most importantly — x402 lets AI agents pay autonomously.
@@ -173,7 +173,7 @@ Starting in Busan, expanding across Southeast Asian ports.
 Targeting $35M ARR via 29 USDC/month carrier subscriptions."
 
 [1:55-2:00] 🙏 Closing
-"Reviewers, please support SeaWatch. Thank you."
+"Reviewers, please support Marino. Thank you."
 ```
 
 ---
@@ -181,7 +181,7 @@ Targeting $35M ARR via 29 USDC/month carrier subscriptions."
 ## 5. Final Checklist
 
 - [ ] Get the Vercel deploy URL
-- [ ] Make `https://github.com/hex-aragon/seawatch` public OR invite hackathon@colosseum.org
+- [ ] Make `https://github.com/hex-aragon/marino` public OR invite hackathon@colosseum.org
 - [ ] Download `public/logo.png` and upload to Colosseum
 - [ ] Record demo video on Loom (≤3 min) → set to Public
 - [ ] Record pitch video on Loom (≤2 min) → set to Public

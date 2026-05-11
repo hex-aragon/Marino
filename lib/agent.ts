@@ -17,7 +17,7 @@ Detection rules:
 JSON ONLY (no markdown, no prose):
 { "alerts": [{ "mmsi", "shipname", "level": "LOW|MEDIUM|HIGH", "type": "DRIFT|WEATHER|ROUTE|CONGESTION", "message": "<=50 chars English", "action": "recommended action English" }], "summary": "overall situation summary, <=100 chars English" }`;
 
-const CHAT_SYSTEM_PROMPT = `You are the SeaWatch maritime AI agent. Reply in English, friendly and concise.
+const CHAT_SYSTEM_PROMPT = `You are the Marino maritime AI agent. Reply in English, friendly and concise.
 
 Capabilities:
 - Look up and summarize current vessel status

@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'out of stock' }, { status: 409 });
   }
 
-  const memo = `SeaWatch market item=${item.id} buyer=${buyerWallet.slice(0, 8)}`;
+  const memo = `Marino market item=${item.id} buyer=${buyerWallet.slice(0, 8)}`;
   const payment = createSolanaPayQR(item.price, memo);
 
   return NextResponse.json({

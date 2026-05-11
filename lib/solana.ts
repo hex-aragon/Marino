@@ -64,13 +64,13 @@ export function createSolanaPayQR(
       amount: new BigNumber(amount),
       splToken,
       reference,
-      label: 'SeaWatch',
+      label: 'Marino',
       message: memo.slice(0, 80),
       memo,
     });
     urlStr = url.toString();
   } catch {
-    urlStr = `solana:${recipientKey.toBase58()}?amount=${amount}&spl-token=${splToken.toBase58()}&reference=${reference.toBase58()}&label=SeaWatch&memo=${encodeURIComponent(
+    urlStr = `solana:${recipientKey.toBase58()}?amount=${amount}&spl-token=${splToken.toBase58()}&reference=${reference.toBase58()}&label=Marino&memo=${encodeURIComponent(
       memo
     )}`;
   }

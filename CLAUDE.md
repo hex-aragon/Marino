@@ -1,4 +1,4 @@
-# 🚢 SeaWatch — Maritime AI Agent Platform
+# 🚢 Marino — Maritime AI Agent Platform
 ## Claude Code 통합 개발 계획서 v2.0
 
 > 전 세계 어느 항구에서도 AI 에이전트가 선박을 모니터링하고,
@@ -39,7 +39,7 @@ AIS 데이터          aisstream.io WebSocket (무료)
 ## 📁 전체 디렉토리 구조
 
 ```
-seawatch/
+marino/
 ├── CLAUDE.md
 ├── app/
 │   ├── page.tsx                     ← 랜딩 페이지
@@ -180,7 +180,7 @@ export interface Escrow {
 ```
 [선원/선사 AI 에이전트]
     ↓ GET /api/weather/premium
-[SeaWatch API 서버]
+[Marino API 서버]
     ↓ 402 Payment Required
       X-Payment-Required: USDC 2 solana:devnet
 [에이전트 자동으로]
@@ -536,7 +536,7 @@ POST /api/marketplace/purchase → 에스크로 생성 + QR 반환
 app/agent/page.tsx와 components/AgentChat.tsx를 만들어줘.
 
 채팅 레이아웃:
-헤더: "SeaWatch 에이전트" + 온라인 상태
+헤더: "Marino 에이전트" + 온라인 상태
 메시지 스크롤 영역
 입력창 + 전송 버튼
 
@@ -607,7 +607,7 @@ app/dashboard/page.tsx를 만들어줘.
 └─────────────────────────────────────────┘
 
 헤더:
-🚢 SeaWatch 로고 / 부산|인천 탭 /
+🚢 Marino 로고 / 부산|인천 탭 /
 선박 수 뱃지 / 기상 상태 뱃지 /
 마켓 버튼 / 에이전트 버튼 / 프리미엄 버튼
 
@@ -667,7 +667,7 @@ Free 0 / Basic 9 USDC/월 / Premium 29 USDC/월
 하단 통계 (카운터 애니메이션):
 선박 100,000+ / 선원 1,890,000+ / 항구 800+
 
-푸터: SeaWatch © 2026 | Powered by Solana + Claude AI
+푸터: Marino © 2026 | Powered by Solana + Claude AI
 ```
 
 ---
@@ -796,6 +796,6 @@ Claude API: zod 스키마 검증
 
 ---
 
-*SeaWatch v2.0 | Next.js + Solana + Claude AI + x402*
+*Marino v2.0 | Next.js + Solana + Claude AI + x402*
 *부산항·인천항 → 글로벌 확장 | Maritime Hackathon 2026*
 
