@@ -1,0 +1,8 @@
+{
+  "framework": "nextjs",
+  "regions": ["icn1"],
+  "functions": {
+    "app/api/agent/**": { "maxDuration": 30 },
+    "app/api/ais/**": { "maxDuration": 10 }
+  }
+}
