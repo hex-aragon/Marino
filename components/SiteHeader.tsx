@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, Bot, Satellite, Zap } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Bot, Zap } from 'lucide-react';
 import { ConnectWalletButton } from '@/components/ConnectWalletButton';
 import { cn } from '@/lib/utils';
 
@@ -10,7 +10,6 @@ const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/marketplace', label: 'Market', icon: ShoppingBag },
   { href: '/agent', label: 'Agent', icon: Bot },
-  { href: '/satellite', label: 'Satellite', icon: Satellite },
 ];
 
 interface Props {

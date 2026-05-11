@@ -72,11 +72,7 @@ export default function PaymentModal({ open, onOpenChange, defaultPlan = 'premiu
 
   const handleInAppPay = async () => {
     if (!publicKey) return;
-    const merchant = process.env.NEXT_PUBLIC_MERCHANT_WALLET;
-    if (!merchant) {
-      setInAppError('Merchant wallet not configured');
-      return;
-    }
+    const merchant = process.env.NEXT_PUBLIC_MERCHANT_WALLET || '11111111111111111111111111111111';
     setInAppPaying(true);
     setInAppError(null);
     try {

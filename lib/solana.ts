@@ -35,11 +35,8 @@ export function getUsdcMint(): PublicKey {
 }
 
 function getMerchantWallet(): PublicKey {
-  const env = process.env.NEXT_PUBLIC_MERCHANT_WALLET;
-  try {
-    if (env) return new PublicKey(env);
-  } catch {}
-  return new PublicKey(PLACEHOLDER_WALLET);
+  const env = process.env.NEXT_PUBLIC_MERCHANT_WALLET || '11111111111111111111111111111111';
+  return new PublicKey(env);
 }
 
 export function createSolanaPayQR(
