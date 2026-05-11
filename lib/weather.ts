@@ -1,10 +1,11 @@
 import { kv } from '@vercel/kv';
 import type { Area, PremiumWeatherForecast, WeatherData } from '@/types';
+import { PORTS, getPort } from '@/lib/ports';
 
-const COORDS: Record<Area, { lat: number; lon: number }> = {
-  busan: { lat: 35.1, lon: 129.0 },
-  incheon: { lat: 37.45, lon: 126.6 },
-};
+function coordsFor(area: Area): { lat: number; lon: number } {
+  const port = getPort(area) ?? PORTS[0];
+  return { lat: port.lat, lon: port.lon };
+}
 
 const MARINE_URL = 'https://marine-api.open-meteo.com/v1/marine';
 
@@ -41,12 +42,12 @@ function pickCurrentIndex(times: string[]): number {
 }
 
 async function fetchFromOpenMeteo(area: Area): Promise<MarineResponse> {
-  const { lat, lon } = COORDS[area];
+  const { lat, lon } = coordsFor(area);
   const params = new URLSearchParams({
     latitude: String(lat),
     longitude: String(lon),
     hourly: 'wave_height,wave_direction,wave_period,wind_wave_height,swell_wave_height',
-    timezone: 'Asia/Seoul',
+    timezone: 'auto',
     forecast_days: '3',
   });
   const res = await fetch(`${MARINE_URL}?${params}`, { cache: 'no-store' });
@@ -92,14 +93,16 @@ function formatHourLabel(iso: string): string {
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const dd = String(d.getDate()).padStart(2, '0');
   const hh = String(d.getHours()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd} ${hh}시`;
+  const mi = String(d.getMinutes()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
 }
 
 function buildRouteAnalysis(
   area: Area,
   hourly: PremiumWeatherForecast['hourly']
 ): string {
-  const portName = area === 'busan' ? '부산항' : '인천항';
+  const port = getPort(area);
+  const portName = port ? `${port.label} Port` : 'Port';
   const dangerWindows: Array<{ start: string; end: string; peak: number }> = [];
   let cur: { startIdx: number; endIdx: number; peak: number } | null = null;
   hourly.forEach((h, i) => {
@@ -129,16 +132,14 @@ function buildRouteAnalysis(
 
   if (dangerWindows.length === 0) {
     const maxWave = hourly.reduce((m, h) => (h.waveHeight > m ? h.waveHeight : m), 0);
-    return `${portName} 향후 72시간 항해 안전 구간입니다. 최대 예상 파고는 ${maxWave.toFixed(1)}m입니다.`;
+    return `${portName} is safe for navigation over the next 72 hours. Maximum expected wave height is ${maxWave.toFixed(1)}m.`;
   }
 
   const parts = dangerWindows.slice(0, 3).map(
     (w) =>
-      `${formatHourLabel(w.start)}~${formatHourLabel(w.end)} 사이 파고 ${w.peak.toFixed(
-        1
-      )}m로 항해 위험 구간이 있습니다`
+      `Wave height ${w.peak.toFixed(1)}m risk window between ${formatHourLabel(w.start)} and ${formatHourLabel(w.end)}`
   );
-  return `${portName} 향후 72시간 중 ${parts.join(', ')}.`;
+  return `${portName} over the next 72 hours: ${parts.join('; ')}.`;
 }
 
 export async function fetchPremiumWeather(area: Area): Promise<PremiumWeatherForecast> {
@@ -189,26 +190,17 @@ export async function fetchPremiumWeather(area: Area): Promise<PremiumWeatherFor
 }
 
 export function getMockWeather(area: Area): WeatherData {
-  if (area === 'busan') {
-    return {
-      area: 'busan',
-      waveHeight: 1.2,
-      waveDirection: 135,
-      wavePeriod: 6.5,
-      windWaveHeight: 0.8,
-      swellWaveHeight: 0.9,
-      riskLevel: 'SAFE',
-      updatedAt: new Date().toISOString(),
-    };
-  }
+  const portId = getPort(area)?.id ?? area;
+  const seed = portId.charCodeAt(0) + portId.length * 7;
+  const wave = Math.round(((seed % 30) / 10 + 0.5) * 10) / 10;
   return {
-    area: 'incheon',
-    waveHeight: 1.8,
-    waveDirection: 270,
-    wavePeriod: 5.8,
-    windWaveHeight: 1.1,
-    swellWaveHeight: 1.2,
-    riskLevel: 'CAUTION',
+    area: portId,
+    waveHeight: wave,
+    waveDirection: (seed * 13) % 360,
+    wavePeriod: 5 + ((seed * 7) % 30) / 10,
+    windWaveHeight: Math.round(wave * 0.7 * 10) / 10,
+    swellWaveHeight: Math.round(wave * 0.8 * 10) / 10,
+    riskLevel: riskFor(wave),
     updatedAt: new Date().toISOString(),
   };
 }

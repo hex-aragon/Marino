@@ -1,3 +1,5 @@
+export type Area = string;
+
 export interface ShipData {
   mmsi: string;
   shipname: string;
@@ -27,7 +29,7 @@ export interface AgentAnalysisResult {
 }
 
 export interface WeatherData {
-  area: 'busan' | 'incheon';
+  area: Area;
   waveHeight: number;
   waveDirection: number;
   wavePeriod: number;
@@ -56,7 +58,7 @@ export interface MarketItem {
   sellerWallet: string;
   sellerName: string;
   sellerRating: number;
-  port: 'busan' | 'incheon' | 'any';
+  port: string;
   deliveryTime: string;
   stock: number;
   createdAt: string;
@@ -80,8 +82,6 @@ export interface PaymentRequest {
   url: string;
   qrData: string;
 }
-
-export type Area = 'busan' | 'incheon';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';

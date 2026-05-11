@@ -6,23 +6,24 @@ import { ArrowRight, Bot, Satellite, Zap, Check, Ship, Users, Anchor } from 'luc
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ConnectWalletButton } from '@/components/ConnectWalletButton';
 import { cn } from '@/lib/utils';
 
 const FEATURES = [
   {
     icon: Satellite,
-    title: '실시간 위성 AIS 모니터링',
-    desc: '전 세계 10만+ 척의 선박을 24시간 자동 추적합니다. 부산·인천을 시작으로 글로벌 항만으로 확장됩니다.',
+    title: '🛰️ Real-time Satellite AIS Monitoring',
+    desc: 'Auto-track 100,000+ vessels worldwide, 24/7. Starting with Busan and Incheon, expanding to global ports.',
   },
   {
     icon: Bot,
-    title: 'AI 이상 감지 에이전트',
-    desc: 'Claude AI가 표류, 기상 위험, 항로 이탈, 밀집을 실시간 감지하고 한국어 알림을 자동 발송합니다.',
+    title: '🤖 AI Anomaly Detection Agent',
+    desc: 'Claude AI detects drift, weather hazards, route deviations, and congestion in real time, and sends alerts automatically.',
   },
   {
     icon: Zap,
-    title: 'Solana 즉시 결제 + x402',
-    desc: '에이전트가 새벽에도 x402 프로토콜로 USDC를 자율 결제합니다. 항구 어디서나 3초 안에 정산.',
+    title: '⚡ Instant Solana Payments + x402',
+    desc: 'Agents settle USDC autonomously via the x402 protocol — even overnight. Anywhere in the world, settled in 3 seconds.',
   },
 ];
 
@@ -31,38 +32,38 @@ const PLANS = [
     name: 'Free',
     price: 0,
     period: '',
-    blurb: '항만 모니터링 시작',
-    features: ['기본 선박 지도', '일 5회 알림', '부산·인천 커버'],
-    cta: '무료 시작',
+    blurb: 'Start monitoring ports',
+    features: ['Basic vessel map', '5 alerts per day', 'Busan & Incheon coverage'],
+    cta: 'Start Free',
     href: '/dashboard',
     highlight: false,
   },
   {
     name: 'Basic',
     price: 9,
-    period: '/월',
-    blurb: '선원·소형 선사용',
-    features: ['무제한 알림', '이메일 자동 발송', '마켓 무수수료', '항로 이탈 분석'],
-    cta: '구독',
+    period: '/mo',
+    blurb: 'For sailors and small operators',
+    features: ['Unlimited alerts', 'Automated email alerts', 'Zero marketplace fees', 'Route deviation analysis'],
+    cta: 'Subscribe',
     href: '/dashboard',
     highlight: false,
   },
   {
     name: 'Premium',
     price: 29,
-    period: '/월',
-    blurb: '선사·운항관리자용',
-    features: ['x402 유료 데이터 무제한', '72시간 정밀 예보', '우선 알림 처리', '에이전트 자율 결제'],
-    cta: '프리미엄 시작',
+    period: '/mo',
+    blurb: 'For shipping operators & fleet managers',
+    features: ['Unlimited x402 paid data', '72-hour precision forecast', 'Priority alert handling', 'Autonomous agent payments'],
+    cta: 'Start Premium',
     href: '/dashboard',
     highlight: true,
   },
 ];
 
 const STATS = [
-  { icon: Ship, label: '선박', value: 100_000, suffix: '+' },
-  { icon: Users, label: '선원', value: 1_890_000, suffix: '+' },
-  { icon: Anchor, label: '항구', value: 800, suffix: '+' },
+  { icon: Ship, label: 'Vessels', value: 100_000, suffix: '+' },
+  { icon: Users, label: 'Sailors', value: 1_890_000, suffix: '+' },
+  { icon: Anchor, label: 'Ports', value: 800, suffix: '+' },
 ];
 
 function useCountUp(target: number, durationMs = 1600) {
@@ -95,6 +96,14 @@ function StatNumber({ value, suffix }: { value: number; suffix: string }) {
 export default function LandingPage() {
   return (
     <div className="min-h-screen overflow-hidden bg-background text-foreground">
+      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-4 backdrop-blur-sm">
+        <Link href="/" className="flex items-center gap-2 text-base font-bold tracking-tight">
+          <span className="text-xl">🚢</span>
+          <span>SeaWatch</span>
+        </Link>
+        <ConnectWalletButton />
+      </header>
+
       <section
         className="relative flex min-h-screen items-center justify-center px-4"
         style={{
@@ -126,28 +135,28 @@ export default function LandingPage() {
           </Badge>
 
           <h1 className="text-5xl font-bold leading-tight tracking-tight md:text-7xl">
-            전 세계 어느 <span className="text-primary">항구</span>에서도
+            From any <span className="text-primary">port</span> in the world
           </h1>
 
           <p className="mt-6 max-w-2xl whitespace-pre-line text-lg text-muted-foreground md:text-xl">
-            {`AI 에이전트가 24시간 선박을 감시하고\nSolana USDC로 3초 안에 결제합니다`}
+            {`AI agents monitor vessels 24/7\nand settle in USDC on Solana within 3 seconds`}
           </p>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link href="/dashboard">
               <Button size="lg" className="h-12 gap-2 px-8 text-base font-semibold">
-                대시보드 보기 <ArrowRight className="h-4 w-4" />
+                View Dashboard <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/agent">
               <Button size="lg" variant="outline" className="h-12 gap-2 px-8 text-base font-semibold">
-                <Bot className="h-4 w-4" /> 에이전트 채팅
+                <Bot className="h-4 w-4" /> Chat with Agent
               </Button>
             </Link>
           </div>
 
           <p className="mt-8 text-xs text-muted-foreground">
-            부산항 · 인천항 실시간 모니터링 가능
+            Real-time monitoring available for Busan Port & Incheon Port
           </p>
         </div>
       </section>
@@ -155,8 +164,8 @@ export default function LandingPage() {
       <section className="px-4 py-24">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
-            <Badge variant="secondary" className="mb-3">핵심 기능</Badge>
-            <h2 className="text-3xl font-bold md:text-4xl">선원과 선사 모두를 위한 플랫폼</h2>
+            <Badge variant="secondary" className="mb-3">Core Features</Badge>
+            <h2 className="text-3xl font-bold md:text-4xl">A platform for both sailors and operators</h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
@@ -184,9 +193,9 @@ export default function LandingPage() {
       <section className="px-4 py-24" style={{ background: 'linear-gradient(180deg, #050d1a, #0a1628)' }}>
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
-            <Badge variant="secondary" className="mb-3">가격</Badge>
-            <h2 className="text-3xl font-bold md:text-4xl">필요한 만큼만 결제하세요</h2>
-            <p className="mt-3 text-muted-foreground">전부 Solana USDC로 결제 · 언제든 해지 가능</p>
+            <Badge variant="secondary" className="mb-3">Pricing</Badge>
+            <h2 className="text-3xl font-bold md:text-4xl">Pay only for what you need</h2>
+            <p className="mt-3 text-muted-foreground">All payments in Solana USDC · Cancel anytime</p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
@@ -201,7 +210,7 @@ export default function LandingPage() {
                 )}
               >
                 {p.highlight && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">추천</Badge>
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Recommended</Badge>
                 )}
                 <CardHeader>
                   <CardTitle className="text-base font-medium text-muted-foreground">{p.name}</CardTitle>
@@ -239,8 +248,8 @@ export default function LandingPage() {
       <section className="px-4 py-24">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
-            <Badge variant="secondary" className="mb-3">잠재 시장</Badge>
-            <h2 className="text-3xl font-bold md:text-4xl">글로벌 해양 시장 규모</h2>
+            <Badge variant="secondary" className="mb-3">Market Opportunity</Badge>
+            <h2 className="text-3xl font-bold md:text-4xl">Global maritime market size</h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
@@ -264,13 +273,13 @@ export default function LandingPage() {
       <footer className="border-t bg-background/80 py-8 text-center text-sm text-muted-foreground">
         <p>SeaWatch © 2026 | Powered by Solana + Claude AI</p>
         <div className="mt-2 flex items-center justify-center gap-4 text-xs">
-          <Link href="/dashboard" className="hover:text-foreground">대시보드</Link>
+          <Link href="/dashboard" className="hover:text-foreground">Dashboard</Link>
           <span className="text-border">·</span>
-          <Link href="/marketplace" className="hover:text-foreground">마켓플레이스</Link>
+          <Link href="/marketplace" className="hover:text-foreground">Marketplace</Link>
           <span className="text-border">·</span>
-          <Link href="/agent" className="hover:text-foreground">에이전트</Link>
+          <Link href="/agent" className="hover:text-foreground">Agent</Link>
           <span className="text-border">·</span>
-          <Link href="/satellite" className="hover:text-foreground">위성</Link>
+          <Link href="/satellite" className="hover:text-foreground">Satellite</Link>
         </div>
       </footer>
     </div>

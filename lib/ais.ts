@@ -1,9 +1,7 @@
 import WebSocket from 'ws';
 import { kv } from '@vercel/kv';
 import type { ShipData, Area } from '@/types';
-
-const BUSAN_BBOX: [[number, number], [number, number]] = [[34.8, 128.8], [35.2, 129.3]];
-const INCHEON_BBOX: [[number, number], [number, number]] = [[37.2, 126.3], [37.6, 126.8]];
+import { PORTS, getPort } from '@/lib/ports';
 
 interface AisState {
   ws: WebSocket | null;
@@ -30,8 +28,9 @@ function inBbox(lat: number, lon: number, bbox: [[number, number], [number, numb
   return lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon;
 }
 
-function bboxFor(area: Area) {
-  return area === 'busan' ? BUSAN_BBOX : INCHEON_BBOX;
+function bboxFor(area: Area): [[number, number], [number, number]] {
+  const port = getPort(area);
+  return port?.bbox ?? PORTS[0].bbox;
 }
 
 function emptyShip(mmsi: string): ShipData {
@@ -118,7 +117,7 @@ function connect() {
     ws.send(
       JSON.stringify({
         APIKey: key,
-        BoundingBoxes: [BUSAN_BBOX, INCHEON_BBOX],
+        BoundingBoxes: PORTS.map((p) => p.bbox),
         FilterMessageTypes: ['PositionReport', 'ShipStaticData'],
       })
     );
@@ -169,37 +168,19 @@ export function getShipsByArea(area: Area): ShipData[] {
   return out;
 }
 
-const MOCK_NAMES_BUSAN = [
-  'HANJIN BUSAN',
-  'OCEAN PEARL',
-  'KMTC SEOUL',
-  'PACIFIC STAR',
-  'SUNNY HORIZON',
-  'EAST BREEZE',
-  'BLUE WHALE',
-  'GOLDEN WAVE',
-  'SILVER TIDE',
-  'NORTHERN LIGHT',
+const MOCK_NAME_POOL = [
+  'OCEAN PEARL', 'PACIFIC STAR', 'SUNNY HORIZON', 'EAST BREEZE',
+  'BLUE WHALE', 'GOLDEN WAVE', 'SILVER TIDE', 'NORTHERN LIGHT',
+  'HARBOR QUEEN', 'COASTAL HOPE', 'MORNING GLORY', 'CRYSTAL BAY',
+  'SEA ARROW', 'POLAR DRIFT', 'GLOBAL TRADER', 'EVER GREEN',
 ];
 
-const MOCK_NAMES_INCHEON = [
-  'INCHEON PIONEER',
-  'YELLOW SEA',
-  'KORAIL FERRY',
-  'WEST WIND',
-  'HARBOR QUEEN',
-  'COASTAL HOPE',
-  'MORNING GLORY',
-  'CRYSTAL BAY',
-  'SEA ARROW',
-  'POLAR DRIFT',
-];
-
-const MOCK_DESTINATIONS = ['BUSAN', 'INCHEON', 'SHANGHAI', 'YOKOHAMA', 'QINGDAO', 'HONG KONG'];
+const MOCK_DESTINATIONS = ['BUSAN', 'INCHEON', 'SHANGHAI', 'YOKOHAMA', 'SINGAPORE', 'HONG KONG', 'DUBAI', 'ROTTERDAM'];
 
 export function getMockShips(area: Area): ShipData[] {
-  const center = area === 'busan' ? { lat: 35.1, lon: 129.0 } : { lat: 37.45, lon: 126.6 };
-  const names = area === 'busan' ? MOCK_NAMES_BUSAN : MOCK_NAMES_INCHEON;
+  const port = getPort(area) ?? PORTS[0];
+  const center = { lat: port.lat, lon: port.lon };
+  const portUpper = port.label.toUpperCase();
   const now = Date.now();
   const ships: ShipData[] = [];
   for (let i = 0; i < 10; i++) {
@@ -210,9 +191,10 @@ export function getMockShips(area: Area): ShipData[] {
     const status = statusPool[i % statusPool.length];
     const sog = status === 0 ? Math.round((((seed * 13) % 18) + Math.random() * 2) * 10) / 10 : 0;
     const cog = Math.round(((seed * 71) % 360) * 10) / 10;
+    const name = i === 0 ? `${portUpper} PIONEER` : MOCK_NAME_POOL[i % MOCK_NAME_POOL.length];
     ships.push({
       mmsi: String(440000000 + i * 137 + seed),
-      shipname: names[i % names.length],
+      shipname: name,
       lat: Math.round((center.lat + latOffset) * 1000) / 1000,
       lon: Math.round((center.lon + lonOffset) * 1000) / 1000,
       sog,

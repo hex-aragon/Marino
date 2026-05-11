@@ -6,7 +6,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PortSelector } from '@/components/PortSelector';
+import { PORTS, getPort } from '@/lib/ports';
 import type { ShipData, AgentAlert, WeatherData, Area } from '@/types';
 
 L.Icon.Default.mergeOptions({
@@ -15,15 +16,15 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-const PORT_CENTERS: Record<Area, [number, number]> = {
-  busan: [35.098, 129.035],
-  incheon: [37.45, 126.6],
-};
+function centerFor(area: Area): [number, number] {
+  const p = getPort(area) ?? PORTS[0];
+  return [p.lat, p.lon];
+}
 
-const PORT_LABELS: Record<Area, string> = {
-  busan: '부산항',
-  incheon: '인천항',
-};
+function labelFor(area: Area): string {
+  const p = getPort(area);
+  return p ? `${p.label} Port` : 'Port';
+}
 
 interface Props {
   ships: ShipData[];
@@ -36,17 +37,17 @@ interface Props {
 }
 
 function statusLabel(status: number, sog: number) {
-  if (status === 1) return '정박';
-  if (status === 5) return '계류';
-  if (status === 0 && sog > 0) return '항해중';
-  if (sog === 0) return '정지';
-  return '항해중';
+  if (status === 1) return 'At Anchor';
+  if (status === 5) return 'Moored';
+  if (status === 0 && sog > 0) return 'Sailing';
+  if (sog === 0) return 'Stopped';
+  return 'Sailing';
 }
 
 function riskLabel(level?: 'SAFE' | 'CAUTION' | 'DANGER') {
-  if (level === 'DANGER') return '위험';
-  if (level === 'CAUTION') return '주의';
-  return '안전';
+  if (level === 'DANGER') return 'Danger';
+  if (level === 'CAUTION') return 'Caution';
+  return 'Safe';
 }
 
 function riskVariant(level?: 'SAFE' | 'CAUTION' | 'DANGER') {
@@ -103,7 +104,7 @@ function FlyToShip({ ship }: { ship?: ShipData }) {
 function CenterOnArea({ area }: { area: Area }) {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(PORT_CENTERS[area], 10, { duration: 0.8 });
+    map.flyTo(centerFor(area), 10, { duration: 0.8 });
   }, [area, map]);
   return null;
 }
@@ -139,8 +140,8 @@ export default function MaritimeMap({
     [focusMmsi, ships],
   );
 
-  const center = PORT_CENTERS[area];
-  const portMarker = portIcon(PORT_LABELS[area]);
+  const center = centerFor(area);
+  const portMarker = portIcon(labelFor(area));
 
   const weatherColor = weather?.riskLevel === 'DANGER' ? '#ff4757' : weather?.riskLevel === 'CAUTION' ? '#ffa502' : null;
   const weatherFillOpacity = weather?.riskLevel === 'DANGER' ? 0.2 : 0.15;
@@ -192,12 +193,12 @@ export default function MaritimeMap({
             >
               <Popup>
                 <div className="space-y-1 text-sm text-black">
-                  <div className="font-semibold">{ship.shipname || '미상'}</div>
+                  <div className="font-semibold">{ship.shipname || 'Unknown'}</div>
                   <div className="text-xs text-gray-600">MMSI: {ship.mmsi}</div>
-                  <div className="text-xs">속도: {ship.sog.toFixed(1)} knots</div>
-                  <div className="text-xs">방향: {ship.cog.toFixed(0)}°</div>
-                  <div className="text-xs">목적지: {ship.destination || '-'}</div>
-                  <div className="text-xs">상태: {statusLabel(ship.status, ship.sog)}</div>
+                  <div className="text-xs">Speed: {ship.sog.toFixed(1)} knots</div>
+                  <div className="text-xs">Heading: {ship.cog.toFixed(0)}°</div>
+                  <div className="text-xs">Destination: {ship.destination || '-'}</div>
+                  <div className="text-xs">Status: {statusLabel(ship.status, ship.sog)}</div>
                   {alert && (
                     <div className="mt-1 rounded bg-red-100 px-2 py-1 text-xs text-red-700">
                       {alert.level} · {alert.message}
@@ -212,32 +213,27 @@ export default function MaritimeMap({
 
       <div className="pointer-events-none absolute inset-0 z-[400]">
         <div className="pointer-events-auto absolute left-3 top-3">
-          <Tabs value={area} onValueChange={(v) => onAreaChange(v as Area)}>
-            <TabsList className="bg-card/90 backdrop-blur border border-border">
-              <TabsTrigger value="busan">부산</TabsTrigger>
-              <TabsTrigger value="incheon">인천</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <PortSelector value={area} onChange={(v) => onAreaChange(v as Area)} />
         </div>
 
         <div className="pointer-events-auto absolute right-3 top-3 flex flex-col items-end gap-2">
           <Badge variant="secondary" className="bg-card/90 backdrop-blur border border-border">
-            🚢 {ships.length}척
+            🚢 {ships.length} vessels
           </Badge>
           {weather && (
             <Badge variant={riskVariant(weather.riskLevel)} className="backdrop-blur">
-              파고 {weather.waveHeight.toFixed(1)}m · {riskLabel(weather.riskLevel)}
+              Wave {weather.waveHeight.toFixed(1)}m · {riskLabel(weather.riskLevel)}
             </Badge>
           )}
         </div>
 
         <div className="pointer-events-auto absolute bottom-3 left-3">
           <Card className="bg-card/90 backdrop-blur p-3 text-xs space-y-1.5">
-            <div className="font-semibold text-foreground mb-1">범례</div>
-            <div className="flex items-center gap-2"><span className="text-primary">▲</span> 항해중</div>
-            <div className="flex items-center gap-2"><span className="text-muted-foreground">●</span> 정박/계류</div>
-            <div className="flex items-center gap-2"><span className="text-warning">!</span> 주의 알림</div>
-            <div className="flex items-center gap-2"><span>⚠️</span> 위험 알림</div>
+            <div className="font-semibold text-foreground mb-1">Legend</div>
+            <div className="flex items-center gap-2"><span className="text-primary">▲</span> Sailing</div>
+            <div className="flex items-center gap-2"><span className="text-muted-foreground">●</span> At Anchor/Moored</div>
+            <div className="flex items-center gap-2"><span className="text-warning">!</span> Caution Alert</div>
+            <div className="flex items-center gap-2"><span>⚠️</span> Danger Alert</div>
           </Card>
         </div>
       </div>

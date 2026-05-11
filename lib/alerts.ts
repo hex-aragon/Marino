@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 import type { AgentAlert } from '@/types';
 
 const ALERT_FROM = 'alerts@seawatch.dev';
-const ALERT_TO = '0xrobertseo@gmail.com';
+const ALERT_TO = process.env.ALERT_EMAIL_TO || 'alerts@seawatch.dev';
 
 export async function sendHighAlertEmail(alert: AgentAlert): Promise<void> {
   const key = process.env.RESEND_API_KEY;
@@ -16,15 +16,15 @@ export async function sendHighAlertEmail(alert: AgentAlert): Promise<void> {
     const subject = `[SeaWatch HIGH] ${alert.shipname}`;
     const html = `
       <div style="font-family:system-ui,sans-serif;color:#0a1628;">
-        <h2 style="color:#dc2626;margin:0 0 12px 0;">해양 위험 감지</h2>
+        <h2 style="color:#dc2626;margin:0 0 12px 0;">Maritime Risk Detected</h2>
         <table style="border-collapse:collapse;font-size:14px;">
-          <tr><td style="padding:6px 12px;color:#64748b;">선박명</td><td style="padding:6px 12px;font-weight:600;">${alert.shipname}</td></tr>
+          <tr><td style="padding:6px 12px;color:#64748b;">Vessel</td><td style="padding:6px 12px;font-weight:600;">${alert.shipname}</td></tr>
           <tr><td style="padding:6px 12px;color:#64748b;">MMSI</td><td style="padding:6px 12px;">${alert.mmsi}</td></tr>
-          <tr><td style="padding:6px 12px;color:#64748b;">위험 등급</td><td style="padding:6px 12px;color:#dc2626;font-weight:700;">${alert.level}</td></tr>
-          <tr><td style="padding:6px 12px;color:#64748b;">유형</td><td style="padding:6px 12px;">${alert.type}</td></tr>
-          <tr><td style="padding:6px 12px;color:#64748b;">메시지</td><td style="padding:6px 12px;">${alert.message}</td></tr>
-          <tr><td style="padding:6px 12px;color:#64748b;">권장 조치</td><td style="padding:6px 12px;">${alert.action}</td></tr>
-          <tr><td style="padding:6px 12px;color:#64748b;">발생 시각</td><td style="padding:6px 12px;">${alert.createdAt}</td></tr>
+          <tr><td style="padding:6px 12px;color:#64748b;">Risk Level</td><td style="padding:6px 12px;color:#dc2626;font-weight:700;">${alert.level}</td></tr>
+          <tr><td style="padding:6px 12px;color:#64748b;">Type</td><td style="padding:6px 12px;">${alert.type}</td></tr>
+          <tr><td style="padding:6px 12px;color:#64748b;">Message</td><td style="padding:6px 12px;">${alert.message}</td></tr>
+          <tr><td style="padding:6px 12px;color:#64748b;">Recommended Action</td><td style="padding:6px 12px;">${alert.action}</td></tr>
+          <tr><td style="padding:6px 12px;color:#64748b;">Detected At</td><td style="padding:6px 12px;">${alert.createdAt}</td></tr>
         </table>
         <p style="margin-top:24px;color:#64748b;font-size:12px;">— SeaWatch AI Maritime Agent</p>
       </div>

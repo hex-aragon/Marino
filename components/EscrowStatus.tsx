@@ -18,7 +18,7 @@ interface Props {
 function statusMeta(status: Escrow['status']) {
   if (status === 'locked') {
     return {
-      label: '에스크로 잠금',
+      label: 'Escrow Locked',
       variant: 'warning' as const,
       icon: Lock,
       bg: 'bg-amber-500/5 border-amber-500/30',
@@ -26,14 +26,14 @@ function statusMeta(status: Escrow['status']) {
   }
   if (status === 'released') {
     return {
-      label: '구매 완료',
+      label: 'Purchase Complete',
       variant: 'success' as const,
       icon: ShieldCheck,
       bg: 'bg-emerald-500/5 border-emerald-500/30',
     };
   }
   return {
-    label: '환불 완료',
+    label: 'Refunded',
     variant: 'secondary' as const,
     icon: RefreshCcw,
     bg: 'bg-muted/40 border-border',
@@ -71,7 +71,7 @@ export default function EscrowStatus({ escrow, onConfirm, onRefund, isLoading, c
               disabled={isLoading}
             >
               <Check className="h-3.5 w-3.5" />
-              수령 확인
+              Confirm Delivery
             </Button>
           )}
           {onRefund && (
@@ -82,7 +82,7 @@ export default function EscrowStatus({ escrow, onConfirm, onRefund, isLoading, c
               onClick={() => onRefund(escrow.id)}
               disabled={isLoading}
             >
-              환불
+              Refund
             </Button>
           )}
         </div>
@@ -90,7 +90,7 @@ export default function EscrowStatus({ escrow, onConfirm, onRefund, isLoading, c
 
       {escrow.status === 'released' && (
         <p className="text-[11px] text-muted-foreground">
-          판매자에게 {formatUSDC(escrow.amount * 0.99)} 전송 완료 (수수료 1% 차감)
+          Sent {formatUSDC(escrow.amount * 0.99)} to seller (1% fee deducted)
         </p>
       )}
     </Card>

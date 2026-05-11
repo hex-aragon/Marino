@@ -78,23 +78,23 @@ export default function AgentAlertPanel({
         <div className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-primary" />
           <div>
-            <div className="text-sm font-semibold text-foreground">AI 해양 에이전트</div>
+            <div className="text-sm font-semibold text-foreground">AI Maritime Agent</div>
             <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
               {isAnalyzing ? (
                 <>
                   <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                  <span>분석 중…</span>
+                  <span>Analyzing…</span>
                 </>
               ) : (
                 <>
                   <span className="inline-block h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)]" />
-                  <span>{lastUpdated ? `마지막 분석: ${timeAgo(lastUpdated)}` : '대기 중'}</span>
+                  <span>{lastUpdated ? `Last analysis: ${timeAgo(lastUpdated)}` : 'Standby'}</span>
                 </>
               )}
             </div>
           </div>
         </div>
-        <Badge variant="outline" className="text-[10px]">{alerts.length}건</Badge>
+        <Badge variant="outline" className="text-[10px]">{alerts.length} alerts</Badge>
       </div>
 
       <div className="p-3">
@@ -102,7 +102,7 @@ export default function AgentAlertPanel({
           <div className="flex items-start gap-2">
             <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
             <p className="text-xs leading-relaxed text-foreground/90">
-              {summary || '현재 모니터링 중인 모든 선박이 안전 범위에 있습니다.'}
+              {summary || 'All monitored vessels are currently within safe range.'}
             </p>
           </div>
         </Card>
@@ -112,7 +112,7 @@ export default function AgentAlertPanel({
         <div className="space-y-2 pb-3">
           {sorted.length === 0 && (
             <div className="text-center text-xs text-muted-foreground py-8">
-              감지된 이상 신호가 없습니다.
+              No anomalies detected.
             </div>
           )}
           {sorted.map((a, i) => (
@@ -128,7 +128,7 @@ export default function AgentAlertPanel({
                 <div className="flex items-center gap-1.5 min-w-0">
                   <span className="text-sm">{levelEmoji(a.level)}</span>
                   <span className="text-sm font-semibold truncate text-foreground">
-                    {a.shipname || '미상'}
+                    {a.shipname || 'Unknown'}
                   </span>
                 </div>
                 <Badge variant={levelBadgeVariant(a.level)} className="text-[9px] shrink-0">
@@ -147,7 +147,7 @@ export default function AgentAlertPanel({
                   onClick={() => onShipFocus?.(a.mmsi)}
                 >
                   <MapPin className="h-3 w-3 mr-1" />
-                  지도에서 보기
+                  View on map
                 </Button>
               </div>
             </Card>
@@ -158,12 +158,12 @@ export default function AgentAlertPanel({
       <div className="border-t border-border p-3">
         {isPremium ? (
           <div className="text-center text-[11px] text-muted-foreground">
-            오늘 분석 <span className="text-primary font-semibold">{alerts.length}</span>건
+            Today: <span className="text-primary font-semibold">{alerts.length}</span> analyses
           </div>
         ) : (
           <Button onClick={onPayClick} className="w-full" size="sm">
             <Sparkles className="h-3.5 w-3.5" />
-            프리미엄 업그레이드 (29 USDC/월)
+            Upgrade to Premium (29 USDC/mo)
           </Button>
         )}
       </div>

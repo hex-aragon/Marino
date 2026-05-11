@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
         }
       } catch (err) {
         console.error('[chat] stream error', err);
-        controller.enqueue(encoder.encode('\n[오류] 응답 생성 중 문제가 발생했습니다.'));
+        controller.enqueue(encoder.encode('\n[Error] A problem occurred while generating the response.'));
       } finally {
         controller.close();
       }

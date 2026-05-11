@@ -15,11 +15,11 @@ interface Props {
 }
 
 function statusLabel(status: number, sog: number) {
-  if (status === 1) return '정박';
-  if (status === 5) return '계류';
-  if (status === 0 && sog > 0) return '항해중';
-  if (sog === 0) return '정지';
-  return '항해중';
+  if (status === 1) return 'At Anchor';
+  if (status === 5) return 'Moored';
+  if (status === 0 && sog > 0) return 'Sailing';
+  if (sog === 0) return 'Stopped';
+  return 'Sailing';
 }
 
 function statusVariant(status: number, sog: number) {
@@ -33,7 +33,7 @@ export default function ShipCard({ ship, alert, onFocus, className }: Props) {
     <Card className={cn('p-3 space-y-2.5', alert?.level === 'HIGH' && 'border-red-500/50 bg-red-500/5', className)}>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <div className="font-semibold text-foreground truncate">{ship.shipname || '미상'}</div>
+          <div className="font-semibold text-foreground truncate">{ship.shipname || 'Unknown'}</div>
           <div className="text-[10px] text-muted-foreground font-mono">MMSI: {ship.mmsi}</div>
         </div>
         <Badge variant={statusVariant(ship.status, ship.sog)} className="text-[10px] shrink-0">
@@ -44,25 +44,25 @@ export default function ShipCard({ ship, alert, onFocus, className }: Props) {
       <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
         <div className="flex items-center gap-1.5 text-muted-foreground">
           <Gauge className="h-3 w-3" />
-          <span>속도</span>
+          <span>Speed</span>
         </div>
         <div className="text-foreground text-right font-medium">{ship.sog.toFixed(1)} kn</div>
 
         <div className="flex items-center gap-1.5 text-muted-foreground">
           <Compass className="h-3 w-3" />
-          <span>방향</span>
+          <span>Heading</span>
         </div>
         <div className="text-foreground text-right font-medium">{ship.cog.toFixed(0)}°</div>
 
         <div className="flex items-center gap-1.5 text-muted-foreground">
           <Navigation className="h-3 w-3" />
-          <span>목적지</span>
+          <span>Destination</span>
         </div>
         <div className="text-foreground text-right font-medium truncate">{ship.destination || '-'}</div>
 
         <div className="flex items-center gap-1.5 text-muted-foreground">
           <MapPin className="h-3 w-3" />
-          <span>위치</span>
+          <span>Position</span>
         </div>
         <div className="text-foreground text-right font-mono text-[10px]">
           {ship.lat.toFixed(3)}, {ship.lon.toFixed(3)}
@@ -79,7 +79,7 @@ export default function ShipCard({ ship, alert, onFocus, className }: Props) {
         <span className="text-[10px] text-muted-foreground">{timeAgo(ship.timestamp)}</span>
         {onFocus && (
           <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px]" onClick={() => onFocus(ship.mmsi)}>
-            지도에서 보기
+            View on map
           </Button>
         )}
       </div>

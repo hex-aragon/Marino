@@ -3,59 +3,83 @@
 import { ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+function recentDate(daysAgo = 3) {
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  return d.toISOString().slice(0, 10);
+}
+
+const GIBS_SNAPSHOT = (date: string) =>
+  `https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&LAYERS=MODIS_Aqua_CorrectedReflectance_TrueColor&CRS=EPSG:4326&BBOX=33,124,38.5,131&WIDTH=1200&HEIGHT=900&FORMAT=image/jpeg&TIME=${date}`;
+
+const WORLDVIEW_URL =
+  'https://worldview.earthdata.nasa.gov/?v=124.0,33.0,131.0,38.5&l=MODIS_Aqua_CorrectedReflectance_TrueColor';
+
 const DATA_SOURCES = [
   {
     name: 'AISStream',
-    desc: '전 세계 선박 AIS 위치 데이터 실시간 WebSocket',
+    desc: 'Real-time WebSocket of global vessel AIS position data',
     href: 'https://aisstream.io',
   },
   {
     name: 'Open-Meteo Marine',
-    desc: '무료 해양 기상 API — 파고, 풍파, 너울 예보',
+    desc: 'Free marine weather API — wave height, wind waves, swell forecasts',
     href: 'https://open-meteo.com/en/docs/marine-weather-api',
   },
   {
     name: 'NASA Worldview',
-    desc: 'MODIS/VIIRS 일일 위성 영상 — 해무·해류 관찰',
+    desc: 'MODIS/VIIRS daily satellite imagery — sea fog and current observation',
     href: 'https://worldview.earthdata.nasa.gov',
   },
   {
-    name: '국가해양위성센터',
-    desc: '천리안 2B GOCI-II 한반도 해역 영상',
+    name: 'Korea Ocean Satellite Center (NOSC)',
+    desc: 'GEO-KOMPSAT-2B GOCI-II imagery of Korean waters',
     href: 'https://kosc.kiost.ac.kr',
   },
   {
-    name: '해양수산부',
-    desc: '공공 항만·해상 통계 및 항행 안전 정보',
+    name: 'Ministry of Oceans & Fisheries',
+    desc: 'Public port and maritime statistics, plus navigational safety information',
     href: 'https://www.mof.go.kr',
   },
   {
     name: 'Copernicus Marine',
-    desc: '유럽우주국 해양 환경 데이터 (염도·수온·해류)',
+    desc: 'ESA marine environment data (salinity, sea temperature, currents)',
     href: 'https://marine.copernicus.eu',
   },
 ];
 
 export default function SatelliteViewer() {
+  const date = recentDate(3);
   return (
     <div className="space-y-10">
       <section>
-        <h2 className="mb-4 text-xl font-semibold">🛰️ NASA Worldview 위성 이미지</h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold">🛰️ NASA Worldview Satellite Imagery</h2>
+          <a
+            href={WORLDVIEW_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:border-primary/60 hover:text-foreground transition-colors"
+          >
+            Open in NASA Worldview <ExternalLink className="h-3 w-3" />
+          </a>
+        </div>
         <div className="overflow-hidden rounded-xl border bg-card">
-          <iframe
-            src="https://worldview.earthdata.nasa.gov/?v=124.0,33.0,131.0,38.5&l=MODIS_Aqua_CorrectedReflectance_TrueColor"
-            title="NASA Worldview"
-            className="h-[400px] w-full"
+          <img
+            src={GIBS_SNAPSHOT(date)}
+            alt={`NASA MODIS Aqua satellite imagery of Korean waters on ${date}`}
+            className="h-[400px] w-full object-cover"
             loading="lazy"
           />
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          출처: NASA EOSDIS Worldview · 한반도 해역 (124°E – 131°E, 33°N – 38.5°N)
+          Source: NASA EOSDIS GIBS · MODIS Aqua True Color · {date} · Korean Peninsula waters (124°E
+          – 131°E, 33°N – 38.5°N)
         </p>
       </section>
 
       <section>
-        <h2 className="mb-4 text-xl font-semibold">📚 공공 데이터 출처</h2>
+        <h2 className="mb-4 text-xl font-semibold">📚 Public Data Sources</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {DATA_SOURCES.map((src) => (
             <a

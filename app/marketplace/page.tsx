@@ -6,32 +6,35 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PORTS } from '@/lib/ports';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import MarketItem from '@/components/MarketItem';
 import MarketPaymentModal from '@/components/MarketPaymentModal';
 import EscrowStatus from '@/components/EscrowStatus';
+import SiteHeader from '@/components/SiteHeader';
 import { useMarket } from '@/hooks/useMarket';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, Loader2, Plus, Search, ShoppingBag } from 'lucide-react';
+import { Loader2, Plus, Search, ShoppingBag, Wallet } from 'lucide-react';
 import type { MarketItem as MarketItemT, Escrow } from '@/types';
 
 type Category = 'all' | MarketItemT['category'];
-type Port = 'all' | 'busan' | 'incheon';
+type Port = 'all' | string;
 
 const CATEGORIES: { value: Category; label: string; emoji: string }[] = [
-  { value: 'all', label: '전체', emoji: '✨' },
-  { value: 'food', label: '식품', emoji: '🍱' },
-  { value: 'parts', label: '부품', emoji: '🔧' },
-  { value: 'service', label: '서비스', emoji: '🛠️' },
-  { value: 'info', label: '정보', emoji: '📡' },
-  { value: 'exchange', label: '환전', emoji: '💱' },
+  { value: 'all', label: 'All', emoji: '✨' },
+  { value: 'food', label: 'Food', emoji: '🍱' },
+  { value: 'parts', label: 'Parts', emoji: '🔧' },
+  { value: 'service', label: 'Service', emoji: '🛠️' },
+  { value: 'info', label: 'Info', emoji: '📡' },
+  { value: 'exchange', label: 'Exchange', emoji: '💱' },
 ];
 
-const DEMO_BUYER_WALLET = '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU';
-
 export default function MarketplacePage() {
+  const { publicKey, connected } = useWallet();
+  const buyerWallet = publicKey?.toBase58() ?? '';
+
   const [port, setPort] = useState<Port>('all');
   const [category, setCategory] = useState<Category>('all');
   const [search, setSearch] = useState('');
@@ -59,7 +62,7 @@ export default function MarketplacePage() {
       {
         id: escrowId,
         itemId: buyTarget.id,
-        buyerWallet: DEMO_BUYER_WALLET,
+        buyerWallet,
         sellerWallet: buyTarget.sellerWallet,
         amount: buyTarget.price,
         txHash: '',
@@ -108,40 +111,53 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
-        <div className="container flex items-center justify-between py-4">
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-4 w-4" />
-                대시보드
-              </Button>
-            </Link>
-            <Separator orientation="vertical" className="h-6" />
-            <h1 className="text-xl font-bold flex items-center gap-2">
-              <ShoppingBag className="h-5 w-5 text-primary" />
-              항구 마켓
-            </h1>
-          </div>
-          <Badge variant="outline" className="text-[10px]">
-            {filtered.length}개 상품
+      <SiteHeader
+        rightSlot={
+          <Badge variant="outline" className="hidden sm:inline-flex text-[10px]">
+            {filtered.length} items
           </Badge>
+        }
+      />
+      <div className="sticky top-14 z-30 border-b border-border bg-background/85 backdrop-blur">
+        <div className="container flex items-center gap-2 pt-3 pb-2">
+          <ShoppingBag className="h-4 w-4 text-primary" />
+          <h1 className="text-base font-semibold">Port Market</h1>
         </div>
-
         <div className="container pb-3 space-y-3">
-          <Tabs value={port} onValueChange={(v) => setPort(v as Port)}>
-            <TabsList>
-              <TabsTrigger value="all">전체</TabsTrigger>
-              <TabsTrigger value="busan">⚓ 부산</TabsTrigger>
-              <TabsTrigger value="incheon">⚓ 인천</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 scrollbar-thin">
+            <button
+              onClick={() => setPort('all')}
+              className={cn(
+                'shrink-0 rounded-full border px-3 py-1 text-xs transition-colors',
+                port === 'all'
+                  ? 'border-primary bg-primary/15 text-primary'
+                  : 'border-border text-muted-foreground hover:border-primary/40 hover:text-foreground',
+              )}
+            >
+              🌍 All Ports
+            </button>
+            {PORTS.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setPort(p.id)}
+                className={cn(
+                  'shrink-0 rounded-full border px-3 py-1 text-xs transition-colors',
+                  port === p.id
+                    ? 'border-primary bg-primary/15 text-primary'
+                    : 'border-border text-muted-foreground hover:border-primary/40 hover:text-foreground',
+                )}
+              >
+                <span className="mr-1">{p.flag}</span>
+                {p.label}
+              </button>
+            ))}
+          </div>
 
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="상품 또는 판매자 검색..."
+                placeholder="Search items or sellers..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
@@ -166,12 +182,21 @@ export default function MarketplacePage() {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="container py-6 space-y-6">
+        {!connected && (
+          <Card className="flex items-center gap-3 border-primary/30 bg-primary/5 px-4 py-3 text-sm">
+            <Wallet className="h-4 w-4 text-primary" />
+            <span className="flex-1 text-muted-foreground">
+              Connect your Solana wallet to buy items in this marketplace.
+            </span>
+          </Card>
+        )}
+
         {localEscrows.length > 0 && (
           <section>
-            <h2 className="text-sm font-semibold text-foreground mb-2">진행 중인 주문</h2>
+            <h2 className="text-sm font-semibold text-foreground mb-2">Active Orders</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {localEscrows.map((e) => (
                 <EscrowStatus
@@ -193,12 +218,20 @@ export default function MarketplacePage() {
             </div>
           ) : filtered.length === 0 ? (
             <Card className="py-16 text-center text-muted-foreground text-sm">
-              조건에 맞는 상품이 없습니다.
+              No items match your filters.
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filtered.map((item) => (
-                <MarketItem key={item.id} item={item} onBuy={setBuyTarget} />
+                <MarketItem
+                  key={item.id}
+                  item={item}
+                  onBuy={(i) => {
+                    if (!connected) return;
+                    setBuyTarget(i);
+                  }}
+                  disabled={!connected}
+                />
               ))}
             </div>
           )}
@@ -212,13 +245,13 @@ export default function MarketplacePage() {
             className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full shadow-lg shadow-primary/30 p-0"
           >
             <Plus className="h-6 w-6" />
-            <span className="sr-only">판매 등록</span>
+            <span className="sr-only">Sell Item</span>
           </Button>
         </SheetTrigger>
         <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>판매 등록</SheetTitle>
-            <SheetDescription>다른 선원에게 USDC로 판매하세요</SheetDescription>
+            <SheetTitle>Sell Item</SheetTitle>
+            <SheetDescription>Sell to other sailors in USDC</SheetDescription>
           </SheetHeader>
           <NewItemForm
             onSubmit={async (data) => {
@@ -234,7 +267,7 @@ export default function MarketplacePage() {
           open={!!buyTarget}
           onOpenChange={(o) => !o && setBuyTarget(null)}
           item={buyTarget}
-          buyerWallet={DEMO_BUYER_WALLET}
+          buyerWallet={buyerWallet}
           onPurchaseComplete={handlePurchaseComplete}
         />
       )}
@@ -260,23 +293,22 @@ function NewItemForm({ onSubmit }: { onSubmit: (d: FormData) => Promise<void> | 
   const [category, setCategory] = useState<MarketItemT['category']>('food');
   const [price, setPrice] = useState('');
   const [port, setPort] = useState<MarketItemT['port']>('busan');
-  const [deliveryTime, setDeliveryTime] = useState('당일 항구 픽업');
+  const [deliveryTime, setDeliveryTime] = useState('Same-day port pickup');
   const [sellerName, setSellerName] = useState('');
   const [sellerWallet, setSellerWallet] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const cats: { v: MarketItemT['category']; l: string; e: string }[] = [
-    { v: 'food', l: '식품', e: '🍱' },
-    { v: 'parts', l: '부품', e: '🔧' },
-    { v: 'service', l: '서비스', e: '🛠️' },
-    { v: 'info', l: '정보', e: '📡' },
-    { v: 'exchange', l: '환전', e: '💱' },
+    { v: 'food', l: 'Food', e: '🍱' },
+    { v: 'parts', l: 'Parts', e: '🔧' },
+    { v: 'service', l: 'Service', e: '🛠️' },
+    { v: 'info', l: 'Info', e: '📡' },
+    { v: 'exchange', l: 'Exchange', e: '💱' },
   ];
 
-  const ports: { v: MarketItemT['port']; l: string }[] = [
-    { v: 'busan', l: '부산' },
-    { v: 'incheon', l: '인천' },
-    { v: 'any', l: '전체' },
+  const ports: { v: string; l: string; flag: string }[] = [
+    ...PORTS.map((p) => ({ v: p.id, l: p.label, flag: p.flag })),
+    { v: 'any', l: 'All Ports', flag: '🌍' },
   ];
 
   const handleSubmit = async () => {
@@ -303,23 +335,23 @@ function NewItemForm({ onSubmit }: { onSubmit: (d: FormData) => Promise<void> | 
   return (
     <div className="mt-4 space-y-4">
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-muted-foreground">상품명</label>
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="예: 김치찌개 도시락" />
+        <label className="text-xs font-medium text-muted-foreground">Title</label>
+        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Hot lunchbox" />
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-muted-foreground">설명</label>
+        <label className="text-xs font-medium text-muted-foreground">Description</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="상품 설명을 자세히 적어주세요"
+          placeholder="Describe the item in detail"
           rows={3}
           className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
         />
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-muted-foreground">카테고리</label>
+        <label className="text-xs font-medium text-muted-foreground">Category</label>
         <div className="flex flex-wrap gap-1.5">
           {cats.map((c) => (
             <button
@@ -341,7 +373,7 @@ function NewItemForm({ onSubmit }: { onSubmit: (d: FormData) => Promise<void> | 
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground">가격 (USDC)</label>
+          <label className="text-xs font-medium text-muted-foreground">Price (USDC)</label>
           <Input
             type="number"
             step="0.01"
@@ -351,30 +383,31 @@ function NewItemForm({ onSubmit }: { onSubmit: (d: FormData) => Promise<void> | 
           />
         </div>
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground">배달 시간</label>
+          <label className="text-xs font-medium text-muted-foreground">Delivery Time</label>
           <Input
             value={deliveryTime}
             onChange={(e) => setDeliveryTime(e.target.value)}
-            placeholder="1시간 내"
+            placeholder="Within 1 hour"
           />
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-muted-foreground">항구</label>
-        <div className="flex gap-1.5">
+        <label className="text-xs font-medium text-muted-foreground">Port</label>
+        <div className="grid grid-cols-3 gap-1.5">
           {ports.map((p) => (
             <button
               key={p.v}
               onClick={() => setPort(p.v)}
               className={cn(
-                'flex-1 rounded-md border px-3 py-2 text-xs transition-colors',
+                'inline-flex items-center justify-center gap-1 rounded-md border px-2 py-1.5 text-[11px] transition-colors',
                 port === p.v
                   ? 'border-primary bg-primary/10 text-primary'
                   : 'border-border text-muted-foreground hover:border-primary/40',
               )}
             >
-              {p.l}
+              <span>{p.flag}</span>
+              <span className="truncate">{p.l}</span>
             </button>
           ))}
         </div>
@@ -383,12 +416,12 @@ function NewItemForm({ onSubmit }: { onSubmit: (d: FormData) => Promise<void> | 
       <Separator />
 
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-muted-foreground">판매자 이름</label>
-        <Input value={sellerName} onChange={(e) => setSellerName(e.target.value)} placeholder="박선장" />
+        <label className="text-xs font-medium text-muted-foreground">Seller Name</label>
+        <Input value={sellerName} onChange={(e) => setSellerName(e.target.value)} placeholder="Captain Smith" />
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-muted-foreground">Solana 지갑 주소</label>
+        <label className="text-xs font-medium text-muted-foreground">Solana Wallet Address</label>
         <Input
           value={sellerWallet}
           onChange={(e) => setSellerWallet(e.target.value)}
@@ -399,7 +432,7 @@ function NewItemForm({ onSubmit }: { onSubmit: (d: FormData) => Promise<void> | 
 
       <Button onClick={handleSubmit} disabled={!valid || submitting} className="w-full">
         {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-        상품 등록
+        Submit Listing
       </Button>
     </div>
   );

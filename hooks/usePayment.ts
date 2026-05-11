@@ -43,6 +43,12 @@ export function usePayment() {
     attemptsRef.current = 0;
   }, [stopPolling]);
 
+  const markPaid = useCallback((signature: string) => {
+    stopPolling();
+    setTxHash(signature);
+    setIsPaid(true);
+  }, [stopPolling]);
+
   const verifyPayment = useCallback(async (ref: string): Promise<boolean> => {
     try {
       const res = await fetch(`/api/payment/verify?reference=${encodeURIComponent(ref)}`);
@@ -108,6 +114,7 @@ export function usePayment() {
   return {
     createPayment,
     verifyPayment,
+    markPaid,
     reset,
     isLoading,
     isPaid,

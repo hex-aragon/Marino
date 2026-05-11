@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatUSDC, timeAgo } from '@/lib/utils';
 import { Anchor, Clock, Star } from 'lucide-react';
+import { getPort } from '@/lib/ports';
 import type { MarketItem as MarketItemT } from '@/types';
 
 interface Props {
   item: MarketItemT;
   onBuy: (item: MarketItemT) => void;
+  disabled?: boolean;
 }
 
 const CATEGORY_EMOJI: Record<MarketItemT['category'], string> = {
@@ -21,20 +23,20 @@ const CATEGORY_EMOJI: Record<MarketItemT['category'], string> = {
 };
 
 const CATEGORY_LABEL: Record<MarketItemT['category'], string> = {
-  food: '식품',
-  parts: '부품',
-  service: '서비스',
-  info: '정보',
-  exchange: '환전',
+  food: 'Food',
+  parts: 'Parts',
+  service: 'Service',
+  info: 'Info',
+  exchange: 'Exchange',
 };
 
-const PORT_LABEL: Record<MarketItemT['port'], string> = {
-  busan: '부산',
-  incheon: '인천',
-  any: '전체',
-};
+function portLabel(p: string): string {
+  if (p === 'any') return 'All';
+  const port = getPort(p);
+  return port ? `${port.flag} ${port.label}` : p;
+}
 
-export default function MarketItem({ item, onBuy }: Props) {
+export default function MarketItem({ item, onBuy, disabled = false }: Props) {
   return (
     <Card className="group flex flex-col p-4 transition-all hover:border-primary/50 hover:shadow-[0_0_20px_-8px_hsl(var(--primary)/0.5)] hover:-translate-y-0.5">
       <div className="flex items-start gap-3 mb-3">
@@ -55,7 +57,7 @@ export default function MarketItem({ item, onBuy }: Props) {
       </div>
 
       <div className="flex items-center gap-2 text-[11px] text-muted-foreground mb-3">
-        <span>선장 {item.sellerName}</span>
+        <span>Captain {item.sellerName}</span>
         <span className="inline-flex items-center gap-0.5">
           <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
           {item.sellerRating.toFixed(1)}
@@ -73,17 +75,17 @@ export default function MarketItem({ item, onBuy }: Props) {
           </span>
           <span className="inline-flex items-center gap-1">
             <Anchor className="h-3 w-3" />
-            {PORT_LABEL[item.port]}
+            {portLabel(item.port)}
           </span>
         </div>
       </div>
 
       <Button
         onClick={() => onBuy(item)}
-        disabled={item.stock <= 0}
+        disabled={item.stock <= 0 || disabled}
         className="w-full mt-auto"
       >
-        {item.stock <= 0 ? '품절' : 'USDC로 구매'}
+        {item.stock <= 0 ? 'Sold Out' : disabled ? 'Connect Wallet' : 'Buy with USDC'}
       </Button>
     </Card>
   );

@@ -1,8 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
-import { ArrowLeft, Waves, Thermometer, Wind } from 'lucide-react';
+import { Waves, Thermometer, Wind } from 'lucide-react';
+import SiteHeader from '@/components/SiteHeader';
 import { useShips } from '@/hooks/useShips';
 import { useWeather } from '@/hooks/useWeather';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +14,7 @@ const MaritimeMap = dynamic(() => import('@/components/MaritimeMap'), {
   ssr: false,
   loading: () => (
     <div className="h-full grid place-items-center text-muted-foreground text-sm">
-      지도 로딩 중...
+      Loading map...
     </div>
   ),
 });
@@ -26,9 +26,9 @@ const RISK_VARIANT = {
 } as const;
 
 const RISK_LABEL = {
-  SAFE: '안전',
-  CAUTION: '주의',
-  DANGER: '위험',
+  SAFE: 'Safe',
+  CAUTION: 'Caution',
+  DANGER: 'Danger',
 } as const;
 
 interface AreaCardProps {
@@ -37,7 +37,7 @@ interface AreaCardProps {
 }
 
 function AreaCard({ area, weather }: AreaCardProps) {
-  const portName = area === 'busan' ? '부산항' : '인천항';
+  const portName = area === 'busan' ? 'Busan Port' : 'Incheon Port';
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -51,7 +51,7 @@ function AreaCard({ area, weather }: AreaCardProps) {
       <CardContent className="grid grid-cols-3 gap-3 text-sm">
         <div className="rounded-lg bg-secondary/50 p-3">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Waves className="h-3 w-3" /> 파고
+            <Waves className="h-3 w-3" /> Wave Height
           </div>
           <div className="mt-1 text-xl font-bold">
             {weather ? weather.waveHeight.toFixed(1) : '—'}
@@ -60,7 +60,7 @@ function AreaCard({ area, weather }: AreaCardProps) {
         </div>
         <div className="rounded-lg bg-secondary/50 p-3">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Thermometer className="h-3 w-3" /> 수온
+            <Thermometer className="h-3 w-3" /> Sea Temp
           </div>
           <div className="mt-1 text-xl font-bold">
             —
@@ -69,7 +69,7 @@ function AreaCard({ area, weather }: AreaCardProps) {
         </div>
         <div className="rounded-lg bg-secondary/50 p-3">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Wind className="h-3 w-3" /> 풍속
+            <Wind className="h-3 w-3" /> Wind Speed
           </div>
           <div className="mt-1 text-xl font-bold">
             —
@@ -88,33 +88,28 @@ export default function SatellitePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" /> 대시보드
-          </Link>
-          <div className="h-5 w-px bg-border" />
-          <h1 className="text-base font-semibold tracking-tight">🛰️ 위성·공공 해양 데이터</h1>
-        </div>
-      </header>
+      <SiteHeader
+        rightSlot={
+          <span className="hidden md:inline-flex items-center gap-1 text-xs text-muted-foreground">
+            🛰️ Public Maritime Data
+          </span>
+        }
+      />
 
       <main className="mx-auto w-full max-w-6xl space-y-10 px-4 py-8">
         <section>
-          <h2 className="mb-4 text-xl font-semibold">🌊 한국 해역 현황</h2>
+          <h2 className="mb-4 text-xl font-semibold">🌊 Korean Maritime Conditions</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <AreaCard area="busan" weather={busanWeather.weather} />
             <AreaCard area="incheon" weather={incheonWeather.weather} />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            출처: Open-Meteo Marine API · 1시간 단위 갱신
+            Source: Open-Meteo Marine API · Refreshed hourly
           </p>
         </section>
 
         <section>
-          <h2 className="mb-4 text-xl font-semibold">🗺️ 선박 밀집도 히트맵</h2>
+          <h2 className="mb-4 text-xl font-semibold">🗺️ Vessel Density Heatmap</h2>
           <div className="h-[500px] overflow-hidden rounded-xl border">
             <MaritimeMap
               ships={busan.ships}
@@ -125,8 +120,8 @@ export default function SatellitePage() {
             />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            데모: 히트맵은 react-leaflet에 leaflet.heat 통합이 필요합니다. 현재는 항해/정박 선박을
-            마커로 시각화합니다.
+            (Demo: heatmap needs leaflet.heat integration with react-leaflet) Currently visualizes
+            cruising/moored vessels as markers.
           </p>
         </section>
 

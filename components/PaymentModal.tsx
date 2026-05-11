@@ -11,7 +11,9 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { cn, formatUSDC } from '@/lib/utils';
 import { usePayment } from '@/hooks/usePayment';
-import { Check, ChevronDown, ChevronUp, ExternalLink, Loader2, ShieldCheck, Sparkles } from 'lucide-react';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { buildUsdcTransferTx } from '@/lib/solana';
+import { Check, ChevronDown, ChevronUp, ExternalLink, Loader2, ShieldCheck, Sparkles, Wallet } from 'lucide-react';
 
 type Plan = 'basic' | 'premium';
 type Step = 'plan' | 'qr' | 'success';
@@ -25,14 +27,14 @@ interface Props {
 const PLAN_INFO: Record<Plan, { name: string; price: number; features: string[]; badge?: string }> = {
   basic: {
     name: 'Basic',
-    price: 9,
-    features: ['실시간 AIS 모니터링', '일 100건 AI 분석', '이메일 알림'],
+    price: 0.09,
+    features: ['Realtime AIS monitoring', '100 AI analyses/day', 'Email alerts'],
   },
   premium: {
     name: 'Premium',
-    price: 29,
-    badge: '추천',
-    features: ['Basic 전체 기능', '무제한 AI 분석', 'x402 유료 API 무료', '72h 상세 기상', '우선 지원'],
+    price: 0.29,
+    badge: 'Recommended',
+    features: ['All Basic features', 'Unlimited AI analyses', 'Free x402 paid APIs', '72h detailed weather', 'Priority support'],
   },
 };
 
@@ -42,7 +44,11 @@ export default function PaymentModal({ open, onOpenChange, defaultPlan = 'premiu
   const [plan, setPlan] = useState<Plan>(defaultPlan);
   const [email, setEmail] = useState('');
   const [showDevnetHelp, setShowDevnetHelp] = useState(false);
-  const { createPayment, isLoading, isPaid, qrData, txHash } = usePayment();
+  const [inAppPaying, setInAppPaying] = useState(false);
+  const [inAppError, setInAppError] = useState<string | null>(null);
+  const { createPayment, markPaid, isLoading, isPaid, qrData, txHash } = usePayment();
+  const { publicKey, sendTransaction } = useWallet();
+  const { connection } = useConnection();
 
   useEffect(() => {
     if (open) {
@@ -64,7 +70,32 @@ export default function PaymentModal({ open, onOpenChange, defaultPlan = 'premiu
     setStep('qr');
   };
 
-  const validUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('ko-KR');
+  const handleInAppPay = async () => {
+    if (!publicKey) return;
+    const merchant = process.env.NEXT_PUBLIC_MERCHANT_WALLET;
+    if (!merchant) {
+      setInAppError('Merchant wallet not configured');
+      return;
+    }
+    setInAppPaying(true);
+    setInAppError(null);
+    try {
+      const tx = await buildUsdcTransferTx(
+        publicKey.toBase58(),
+        merchant,
+        PLAN_INFO[plan].price,
+      );
+      const signature = await sendTransaction(tx, connection);
+      await connection.confirmTransaction(signature, 'confirmed');
+      markPaid(signature);
+    } catch (e: any) {
+      setInAppError(e?.message || 'In-app payment failed');
+    } finally {
+      setInAppPaying(false);
+    }
+  };
+
+  const validUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -72,8 +103,8 @@ export default function PaymentModal({ open, onOpenChange, defaultPlan = 'premiu
         {step === 'plan' && (
           <>
             <DialogHeader>
-              <DialogTitle>구독 플랜 선택</DialogTitle>
-              <DialogDescription>Solana USDC로 즉시 결제됩니다</DialogDescription>
+              <DialogTitle>Choose Subscription Plan</DialogTitle>
+              <DialogDescription>Instant payment with Solana USDC</DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 gap-3">
               {(Object.keys(PLAN_INFO) as Plan[]).map((p) => {
@@ -96,7 +127,7 @@ export default function PaymentModal({ open, onOpenChange, defaultPlan = 'premiu
                     <div className="font-semibold text-foreground">{info.name}</div>
                     <div className="mt-1 text-2xl font-bold text-primary">
                       {info.price}
-                      <span className="text-xs text-muted-foreground font-normal"> USDC/월</span>
+                      <span className="text-xs text-muted-foreground font-normal"> USDC/mo</span>
                     </div>
                     <ul className="mt-3 space-y-1 text-[11px] text-muted-foreground">
                       {info.features.map((f) => (
@@ -111,7 +142,7 @@ export default function PaymentModal({ open, onOpenChange, defaultPlan = 'premiu
               })}
             </div>
             <div className="space-y-2">
-              <label className="text-xs text-muted-foreground">이메일 (알림 수신)</label>
+              <label className="text-xs text-muted-foreground">Email (for alerts)</label>
               <Input
                 type="email"
                 placeholder="captain@ship.com"
@@ -121,7 +152,7 @@ export default function PaymentModal({ open, onOpenChange, defaultPlan = 'premiu
             </div>
             <Button onClick={handleStart} disabled={isLoading || !email} className="w-full">
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              {formatUSDC(PLAN_INFO[plan].price)}로 결제하기
+              Pay {formatUSDC(PLAN_INFO[plan].price)}
             </Button>
           </>
         )}
@@ -129,9 +160,9 @@ export default function PaymentModal({ open, onOpenChange, defaultPlan = 'premiu
         {step === 'qr' && (
           <>
             <DialogHeader>
-              <DialogTitle>Solana Pay로 결제</DialogTitle>
+              <DialogTitle>Pay with Solana Pay</DialogTitle>
               <DialogDescription>
-                {PLAN_INFO[plan].name} 플랜 · {formatUSDC(PLAN_INFO[plan].price)}
+                {PLAN_INFO[plan].name} plan · {formatUSDC(PLAN_INFO[plan].price)}
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col items-center gap-3">
@@ -146,22 +177,48 @@ export default function PaymentModal({ open, onOpenChange, defaultPlan = 'premiu
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                <span>5초마다 자동 확인 중...</span>
+                <span>Auto-checking every 5s...</span>
               </div>
+
+              {publicKey && (
+                <div className="w-full space-y-2">
+                  <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+                    <div className="h-px flex-1 bg-border" />
+                    <span>or</span>
+                    <div className="h-px flex-1 bg-border" />
+                  </div>
+                  <Button
+                    onClick={handleInAppPay}
+                    disabled={inAppPaying}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    {inAppPaying ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Wallet className="h-4 w-4" />
+                    )}
+                    Pay with connected wallet
+                  </Button>
+                  {inAppError && (
+                    <p className="text-[11px] text-red-400">{inAppError}</p>
+                  )}
+                </div>
+              )}
             </div>
             <Card className="bg-muted/50">
               <button
                 onClick={() => setShowDevnetHelp((v) => !v)}
                 className="flex w-full items-center justify-between p-3 text-left"
               >
-                <span className="text-xs font-medium">devnet 테스트 안내</span>
+                <span className="text-xs font-medium">Devnet test note</span>
                 {showDevnetHelp ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </button>
               {showDevnetHelp && (
                 <div className="px-3 pb-3 text-[11px] text-muted-foreground space-y-1.5">
-                  <p>· Solana devnet 환경의 테스트 USDC가 필요합니다.</p>
-                  <p>· Phantom 지갑을 devnet으로 전환하고 QR을 스캔하세요.</p>
-                  <p>· 데모 환경에서는 <code className="text-primary">mock_xxx</code>로 시작하는 트랜잭션 해시로 즉시 검증 가능합니다.</p>
+                  <p>· Requires test USDC on the Solana devnet.</p>
+                  <p>· Switch your Phantom wallet to devnet and scan the QR.</p>
+                  <p>· In demo mode, transaction hashes starting with <code className="text-primary">mock_xxx</code> are instantly verified.</p>
                 </div>
               )}
             </Card>
@@ -173,23 +230,23 @@ export default function PaymentModal({ open, onOpenChange, defaultPlan = 'premiu
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-primary" />
-                결제 완료
+                Payment Complete
               </DialogTitle>
-              <DialogDescription>{PLAN_INFO[plan].name} 플랜이 활성화되었습니다</DialogDescription>
+              <DialogDescription>{PLAN_INFO[plan].name} plan activated</DialogDescription>
             </DialogHeader>
             <Card className="bg-primary/5 border-primary/20 p-4 space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">결제 금액</span>
+                <span className="text-muted-foreground">Amount</span>
                 <span className="font-semibold text-foreground">{formatUSDC(PLAN_INFO[plan].price)}</span>
               </div>
               <Separator />
               <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">구독 유효기간</span>
+                <span className="text-muted-foreground">Valid Until</span>
                 <span className="font-semibold text-foreground">~ {validUntil}</span>
               </div>
               <Separator />
               <div className="text-xs">
-                <div className="text-muted-foreground mb-1">트랜잭션 해시</div>
+                <div className="text-muted-foreground mb-1">Transaction Hash</div>
                 <a
                   href={`https://explorer.solana.com/tx/${txHash}?cluster=devnet`}
                   target="_blank"
@@ -208,7 +265,7 @@ export default function PaymentModal({ open, onOpenChange, defaultPlan = 'premiu
                 router.push('/dashboard');
               }}
             >
-              대시보드로 이동
+              Go to Dashboard
             </Button>
           </>
         )}

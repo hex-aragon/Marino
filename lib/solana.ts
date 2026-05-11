@@ -148,6 +148,40 @@ export async function transferUSDC(
   }
 }
 
+export async function buildUsdcTransferTx(
+  fromWallet: string,
+  toWallet: string,
+  amount: number,
+): Promise<Transaction> {
+  const conn = getConnection();
+  const mint = getUsdcMint();
+  const fromKey = new PublicKey(fromWallet);
+  const toKey = new PublicKey(toWallet);
+
+  const fromAta = await getAssociatedTokenAddress(mint, fromKey);
+  const toAta = await getAssociatedTokenAddress(mint, toKey);
+
+  const tx = new Transaction();
+
+  try {
+    await getAccount(conn, toAta);
+  } catch {
+    tx.add(
+      createAssociatedTokenAccountInstruction(fromKey, toAta, toKey, mint),
+    );
+  }
+
+  const decimals = 6;
+  const raw = BigInt(Math.round(amount * Math.pow(10, decimals)));
+  tx.add(createTransferInstruction(fromAta, toAta, fromKey, raw));
+
+  const { blockhash } = await conn.getLatestBlockhash('confirmed');
+  tx.recentBlockhash = blockhash;
+  tx.feePayer = fromKey;
+
+  return tx;
+}
+
 export function loadFeePayer(): Keypair | null {
   const raw = process.env.SOLANA_FEE_PAYER_PRIVATE_KEY;
   if (!raw) return null;

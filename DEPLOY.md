@@ -1,66 +1,65 @@
-# SeaWatch 제출 가이드
+# SeaWatch Submission Guide
 
-## 1. Vercel 배포 (가장 빠른 길)
+## 1. Vercel Deploy (Fastest Path)
 
-### 1-1. Vercel에서 프로젝트 Import
+### 1-1. Import Project on Vercel
 
-1. https://vercel.com/new 접속 (GitHub 로그인)
-2. **Import Git Repository** → `hex-aragon/seawatch` 선택
-3. **Configure Project** 화면에서:
-   - Framework Preset: **Next.js** (자동 감지)
-   - Root Directory: `./` (기본값)
-   - Build Command: `npm run build` (기본값)
-   - Output Directory: `.next` (기본값)
+1. Go to https://vercel.com/new (sign in with GitHub)
+2. **Import Git Repository** → select `hex-aragon/seawatch`
+3. On the **Configure Project** screen:
+   - Framework Preset: **Next.js** (auto-detected)
+   - Root Directory: `./` (default)
+   - Build Command: `npm run build` (default)
+   - Output Directory: `.next` (default)
 
-### 1-2. 환경 변수 입력 (Environment Variables 섹션)
+### 1-2. Environment Variables
 
-**필수 (없으면 목업 모드로 동작):**
+**Required (without these, the app runs in mock mode):**
 
-| Key | Value | 비고 |
-|-----|-------|------|
-| `AISSTREAM_API_KEY` | `53856cc910261136304f9fb4f677323377c92d6c` | CLAUDE.md에 있는 키 |
-| `ANTHROPIC_API_KEY` | `sk-ant-...` | https://console.anthropic.com 에서 발급 |
-| `NEXT_PUBLIC_SOLANA_NETWORK` | `devnet` | devnet 으로 데모 |
-| `NEXT_PUBLIC_MERCHANT_WALLET` | (본인 Solana 지갑 주소) | Phantom/Solflare 지갑 |
+| Key | Value | Notes |
+|-----|-------|-------|
+| `AISSTREAM_API_KEY` | `53856cc910261136304f9fb4f677323377c92d6c` | Key from CLAUDE.md |
+| `ANTHROPIC_API_KEY` | `sk-ant-...` | Issue at https://console.anthropic.com |
+| `NEXT_PUBLIC_SOLANA_NETWORK` | `devnet` | Use devnet for the demo |
+| `NEXT_PUBLIC_MERCHANT_WALLET` | (your Solana wallet address) | Phantom / Solflare wallet |
 
-**선택 (없어도 동작):**
+**Optional (the app still works without these):**
 
 | Key | Value |
 |-----|-------|
-| `SOLANA_FEE_PAYER_PRIVATE_KEY` | (선택) base58 개인키 |
-| `KV_REST_API_URL` | Vercel Storage > KV 생성 후 자동 주입 |
-| `KV_REST_API_TOKEN` | Vercel Storage > KV 생성 후 자동 주입 |
-| `RESEND_API_KEY` | https://resend.com 무료 가입 |
+| `SOLANA_FEE_PAYER_PRIVATE_KEY` | (optional) base58 private key |
+| `KV_REST_API_URL` | Auto-injected after creating Vercel Storage > KV |
+| `KV_REST_API_TOKEN` | Auto-injected after creating Vercel Storage > KV |
+| `RESEND_API_KEY` | Free signup at https://resend.com |
 
-### 1-3. Deploy 클릭
+### 1-3. Click Deploy
 
-- 1~2분 소요
-- 배포 완료되면 `https://seawatch-xxxx.vercel.app` URL 발급
-- 이 URL을 **Colosseum 제출의 "Live product link"** 에 입력
+- Takes 1–2 minutes
+- You'll receive a `https://seawatch-xxxx.vercel.app` URL
+- Paste this URL into the **"Live product link"** field on the Colosseum submission form
 
-### 1-4. Vercel KV 추가 (선택, 캐싱용)
+### 1-4. Add Vercel KV (Optional, for caching)
 
-배포 후 Vercel 대시보드 → Storage → Create Database → KV 선택 → 자동으로 환경변수 주입됨.
-없어도 데모 가능.
+After deploy: Vercel Dashboard → Storage → Create Database → choose KV. Env vars are auto-injected. Not required for the demo.
 
 ---
 
-## 2. Colosseum 제출 폼 채우기
+## 2. Filling Out the Colosseum Submission Form
 
 ### Step 2: Media and Code
 
-| 필드 | 입력값 |
-|------|-------|
-| **Project logo or graphic** | `public/logo.png` 파일 업로드 (이미 1024x1024 PNG로 생성됨) |
+| Field | Value |
+|-------|-------|
+| **Project logo or graphic** | Upload `public/logo.png` (already 1024x1024 PNG) |
 | **GitHub link** | `https://github.com/hex-aragon/seawatch` |
-| **GitHub repo context** | 아래 텍스트 복붙 ↓ |
-| **Product demo video** | Loom 녹화 후 URL (아래 스크립트 사용) |
+| **GitHub repo context** | Copy text below ↓ |
+| **Product demo video** | Record on Loom, paste URL (script below) |
 | **Demo video visibility** | ✅ Public |
-| **Live product link** | Vercel 배포 URL |
-| **Access instructions** | 아래 텍스트 복붙 ↓ |
-| **Pitch video** | Loom 녹화 후 URL (아래 스크립트 사용) |
+| **Live product link** | Your Vercel URL |
+| **Access instructions** | Copy text below ↓ |
+| **Pitch video** | Record on Loom, paste URL (script below) |
 
-### GitHub repo context 복붙용
+### GitHub repo context (copy & paste)
 
 ```
 - /lib/agent.ts — Claude maritime safety prompt + streaming logic
@@ -73,16 +72,16 @@
 - Mock data fallbacks exist for all external APIs so the demo works without keys
 ```
 
-### Access instructions 복붙용
+### Access instructions (copy & paste)
 
 ```
 1. Open the live URL — landing page loads with hero, features, pricing.
-2. Click "대시보드 보기" → /dashboard shows live Busan vessels via aisstream.io WebSocket.
-3. Wait ~15 seconds for Claude AI to analyze ships; red/orange markers and the right panel will populate with Korean-language alerts.
-4. Toggle between 부산 / 인천 tabs (top-left of map) to switch ports.
+2. Click "View Dashboard" → /dashboard shows live Busan vessels via aisstream.io WebSocket.
+3. Wait ~15 seconds for Claude AI to analyze ships; red/orange markers and the right panel will populate with alerts.
+4. Toggle between Busan / Incheon tabs (top-left of map) to switch ports.
 5. Click any ship marker for popup details (speed, heading, destination, alert).
-6. Click 마켓 (top-right) → /marketplace lists USDC-priced items; click "USDC로 구매" on any item to open the Solana Pay QR escrow modal.
-7. Click 에이전트 → /agent opens streaming Claude chat. Try: "Give me a 72-hour premium forecast for Busan" — agent uses x402 to autopay 2 USDC for the premium endpoint.
+6. Click Market (top-right) → /marketplace lists USDC-priced items; click "Buy with USDC" on any item to open the Solana Pay QR escrow modal.
+7. Click Agent → /agent opens streaming Claude chat. Try: "Give me a 72-hour premium forecast for Busan" — agent uses x402 to autopay 2 USDC for the premium endpoint.
 8. For payment demo: connect Phantom wallet on Solana devnet, get devnet USDC from https://faucet.circle.com, then scan QR.
 9. /satellite shows NASA Worldview iframe + density heatmap + public-data source cards.
 
@@ -94,104 +93,102 @@ Notes:
 
 ---
 
-## 3. 데모 영상 녹화 (3분, Loom 추천)
+## 3. Demo Video Recording (3 min, Loom recommended)
 
-### 준비
+### Prep
 
-1. https://loom.com 가입 (무료, 25개 영상까지)
-2. Chrome 확장 또는 데스크톱 앱 설치
-3. 배포된 Vercel URL 열어두기
-4. 마이크/화면 권한 허용
+1. Sign up at https://loom.com (free, up to 25 videos)
+2. Install the Chrome extension or desktop app
+3. Keep your deployed Vercel URL open in a tab
+4. Allow mic and screen permissions
 
-### 녹화 스크립트 (90초 단축판)
-
-> 한글로 녹화하고 영문 자막을 Loom에서 추가하거나, 영어로 그대로 녹화
+### Recording Script (90-second short version)
 
 ```
-[0:00-0:10] 🎬 인트로
-"안녕하세요. SeaWatch는 솔라나 기반 해양 AI 에이전트 플랫폼입니다.
-지금부터 핵심 3가지를 90초 안에 보여드리겠습니다."
+[0:00-0:10] 🎬 Intro
+"Hi, SeaWatch is a Solana-based maritime AI agent platform.
+Let me show you three core features in 90 seconds."
 
-→ /dashboard 로 이동
+→ Navigate to /dashboard
 
-[0:10-0:35] 🚢 대시보드
-"부산항의 실제 선박들입니다. AISStream으로 실시간 추적됩니다.
-빨간 마커는 Claude AI 에이전트가 위험으로 분류한 선박입니다.
-오른쪽 패널에서 표류 의심, 기상 위험 등 한국어 알림을 자동 생성합니다.
-HIGH 등급은 운항관리자 이메일로 4초 안에 발송됩니다."
+[0:10-0:35] 🚢 Dashboard
+"These are real vessels in Busan Port, tracked live via AISStream.
+Red markers are ships the Claude AI agent flagged as risky.
+The right panel auto-generates alerts: drift suspected, weather risk, and more.
+HIGH-severity alerts ship to the operations email within 4 seconds."
 
-→ 마켓 버튼 클릭
+→ Click the Market button
 
-[0:35-1:00] 🛒 마켓플레이스
-"항구에 있는 선원들이 식품, 부품, 서비스를 USDC로 거래합니다.
-예시 — 라면 박스 12 USDC. '구매' 클릭 → Solana Pay QR이 뜹니다.
-스캔하면 결제 USDC가 에스크로에 잠기고,
-선원이 수령 확인을 눌러야 판매자에게 전송됩니다."
+[0:35-1:00] 🛒 Marketplace
+"Sailors at the port trade food, parts, and services in USDC.
+For example — a ramen box for 12 USDC. Click 'Buy' and a Solana Pay QR pops up.
+After payment, the USDC is locked in escrow,
+and only released once the sailor confirms delivery."
 
-→ /agent 로 이동
+→ Navigate to /agent
 
-[1:00-1:30] 🤖 x402 (핵심)
-"SeaWatch가 가장 특별한 부분입니다.
-AI 에이전트에게 72시간 프리미엄 기상 예보를 요청하면,
-에이전트가 유료 API에 접근 → 서버가 402 응답 → 자동으로 2 USDC를 지불 → 데이터를 받아옵니다.
-사람 개입은 0%. 새벽 3시에도 에이전트는 작동합니다."
+[1:00-1:30] 🤖 x402 (the key part)
+"This is what makes SeaWatch unique.
+Ask the AI agent for a 72-hour premium weather forecast and
+the agent hits a paid API → server returns 402 → agent autopays 2 USDC → data arrives.
+Zero human intervention. The agent works at 3 a.m. too."
 
-[1:30-1:40] 🌍 클로징
-"전 세계 선박 10만 척, 선원 189만 명, 항구 800개.
-모두 Solana에서 결제됩니다. 감사합니다."
+[1:30-1:40] 🌍 Closing
+"100,000+ vessels, 1.89M sailors, 800+ ports worldwide.
+All settled on Solana. Thank you."
 ```
 
 ---
 
-## 4. Pitch 영상 녹화 (2분, Loom)
+## 4. Pitch Video Recording (2 min, Loom)
 
-### 스크립트
+### Script
 
 ```
-[0:00-0:15] 👋 인사
-"안녕하세요. SeaWatch 만든 [본인 이름]입니다.
-저는 [백그라운드 한 줄 — 예: 부산에서 자란 풀스택 개발자]입니다."
+[0:00-0:15] 👋 Hello
+"Hi, I'm [your name], the builder of SeaWatch.
+My background: [one line — e.g., full-stack developer who grew up in Busan]."
 
-[0:15-0:45] 💔 문제
-"해운업은 14조 달러 산업이지만 여전히 팩스로 서류를 주고받고,
-선박 모니터링은 사람이 24시간 교대로 합니다.
-선원들은 외국 항구에서 결제가 막혀 라면 살 돈을 빌리기도 합니다.
-이걸 풀어야겠다고 생각했습니다."
+[0:15-0:45] 💔 Problem
+"Shipping is a $14 trillion industry but still runs paperwork over fax,
+and ships are monitored by humans in 24-hour rotations.
+Sailors in foreign ports sometimes can't even pay for a meal because their cards are blocked.
+I wanted to fix this."
 
-[0:45-1:15] 💡 솔루션
-"SeaWatch는 세 가지를 합칩니다.
-첫째, Claude AI가 AIS 데이터를 분석해 24시간 선박을 모니터링합니다.
-둘째, 선원끼리 USDC로 P2P 거래하는 에스크로 마켓을 엽니다.
-셋째, 가장 중요한 x402로 AI 에이전트가 자율 결제합니다.
-사람이 없을 때도 에이전트 경제가 돌아갑니다."
+[0:45-1:15] 💡 Solution
+"SeaWatch combines three things.
+First, Claude AI monitors AIS data 24/7 and flags risk.
+Second, sailors trade P2P in USDC through an on-chain escrow market.
+Third — and most importantly — x402 lets AI agents pay autonomously.
+Even when nobody is awake, the agent economy keeps running."
 
-[1:15-1:35] ⏰ 왜 지금
-"2026년 시점에 세 가지가 정렬됐습니다.
-AIS 데이터가 무료로 풀렸고, Claude가 해양 추론을 충분히 잘하고,
-x402가 출시되면서 에이전트가 실제 결제를 할 수 있게 됐습니다."
+[1:15-1:35] ⏰ Why Now
+"In 2026, three things finally aligned:
+AIS data is freely available, Claude is strong enough to reason about maritime data,
+and the x402 launch made agent-native payments real."
 
-[1:35-1:55] 📈 시장 + 비전
-"전 세계 상선 10만 척, 선원 189만 명, 항구 800개.
-부산에서 시작해 동남아 항구로 확장합니다.
-선사 월 29 USDC 구독으로 ARR 3,500만 달러를 노립니다."
+[1:35-1:55] 📈 Market + Vision
+"100,000+ commercial vessels, 1.89M sailors, 800+ ports worldwide.
+Starting in Busan, expanding across Southeast Asian ports.
+Targeting $35M ARR via 29 USDC/month carrier subscriptions."
 
-[1:55-2:00] 🙏 클로징
-"심사관님, SeaWatch를 응원해주세요. 감사합니다."
+[1:55-2:00] 🙏 Closing
+"Reviewers, please support SeaWatch. Thank you."
 ```
 
 ---
 
-## 5. 마지막 체크리스트
+## 5. Final Checklist
 
-- [ ] Vercel 배포 URL 받기
-- [ ] `https://github.com/hex-aragon/seawatch` 공개 또는 hackathon@colosseum.org 초대
-- [ ] `public/logo.png` 다운로드 후 Colosseum 업로드
-- [ ] Loom으로 데모 영상 (3분 이내) 녹화 → Public 설정
-- [ ] Loom으로 Pitch 영상 (2분 이내) 녹화 → Public 설정
-- [ ] Colosseum 폼 모든 필드 입력
-- [ ] Team Background (0xaragon) 섹션 본인이 직접 작성
-- [ ] Continue to final survey → 제출
+- [ ] Get the Vercel deploy URL
+- [ ] Make `https://github.com/hex-aragon/seawatch` public OR invite hackathon@colosseum.org
+- [ ] Download `public/logo.png` and upload to Colosseum
+- [ ] Record demo video on Loom (≤3 min) → set to Public
+- [ ] Record pitch video on Loom (≤2 min) → set to Public
+- [ ] Fill out every field on the Colosseum form
+- [ ] Write the Team Background (0xaragon) section yourself
+- [ ] Continue to final survey → submit
 
-남은 시간: 약 15시간. 영상 녹화만 30~60분이면 충분합니다.
+About 15 hours remaining. Recording the videos only takes 30–60 minutes.
 
-화이팅! 🚢
+Let's ship it! 🚢

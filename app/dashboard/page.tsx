@@ -1,18 +1,18 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { useState } from 'react';
-import { Ship, Waves, AlertTriangle, Crown, Bot, ShoppingBag, Clock } from 'lucide-react';
+import { Ship, Waves, AlertTriangle, Crown, Bot, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PortSelector } from '@/components/PortSelector';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useShips } from '@/hooks/useShips';
 import { useWeather } from '@/hooks/useWeather';
 import { useAgent } from '@/hooks/useAgent';
 import { usePayment } from '@/hooks/usePayment';
 import AgentAlertPanel from '@/components/AgentAlertPanel';
+import SiteHeader from '@/components/SiteHeader';
 import PaymentModal from '@/components/PaymentModal';
 import { timeAgo } from '@/lib/utils';
 import type { Area } from '@/types';
@@ -21,7 +21,7 @@ const MaritimeMap = dynamic(() => import('@/components/MaritimeMap'), {
   ssr: false,
   loading: () => (
     <div className="h-full grid place-items-center text-muted-foreground text-sm">
-      지도 로딩 중...
+      Loading map...
     </div>
   ),
 });
@@ -33,9 +33,9 @@ const RISK_VARIANT = {
 } as const;
 
 const RISK_LABEL = {
-  SAFE: '안전',
-  CAUTION: '주의',
-  DANGER: '위험',
+  SAFE: 'Safe',
+  CAUTION: 'Caution',
+  DANGER: 'Danger',
 } as const;
 
 export default function DashboardPage() {
@@ -50,57 +50,40 @@ export default function DashboardPage() {
 
   const dangerCount = alerts.filter((a) => a.level === 'HIGH' || a.level === 'MEDIUM').length;
   const waveText = weather ? `${weather.waveHeight.toFixed(1)}m` : '—';
-  const updatedText = lastUpdated ? timeAgo(lastUpdated) : '대기 중';
+  const updatedText = lastUpdated ? timeAgo(lastUpdated) : 'Standby';
 
   return (
     <div className="flex h-screen flex-col bg-background text-foreground">
-      <header className="flex h-14 shrink-0 items-center justify-between border-b bg-background/80 px-4 backdrop-blur">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-2 text-base font-bold tracking-tight">
-            <span className="text-xl">🚢</span>
-            <span>SeaWatch</span>
-          </Link>
-
-          <Tabs value={area} onValueChange={(v) => setArea(v as Area)}>
-            <TabsList className="h-8">
-              <TabsTrigger value="busan" className="text-xs">부산</TabsTrigger>
-              <TabsTrigger value="incheon" className="text-xs">인천</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="hidden sm:inline-flex gap-1">
-            <Ship className="h-3 w-3" /> {ships.length}척
-          </Badge>
-          {weather && (
-            <Badge variant={RISK_VARIANT[weather.riskLevel]} className="hidden sm:inline-flex gap-1">
-              <Waves className="h-3 w-3" /> {waveText} · {RISK_LABEL[weather.riskLevel]}
+      <SiteHeader
+        rightSlot={
+          <>
+            <Badge variant="secondary" className="hidden sm:inline-flex gap-1">
+              <Ship className="h-3 w-3" /> {ships.length}
             </Badge>
-          )}
-          <Link href="/marketplace">
-            <Button variant="ghost" size="sm" className="gap-1.5">
-              <ShoppingBag className="h-4 w-4" />
-              <span className="hidden md:inline">마켓</span>
+            {weather && (
+              <Badge variant={RISK_VARIANT[weather.riskLevel]} className="hidden sm:inline-flex gap-1">
+                <Waves className="h-3 w-3" /> {waveText}
+              </Badge>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPaymentOpen(true)}
+              className="gap-1.5"
+            >
+              <Crown className="h-4 w-4" />
+              <span className="hidden md:inline">Premium</span>
             </Button>
-          </Link>
-          <Link href="/agent">
-            <Button variant="ghost" size="sm" className="gap-1.5">
-              <Bot className="h-4 w-4" />
-              <span className="hidden md:inline">에이전트</span>
-            </Button>
-          </Link>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={() => setPaymentOpen(true)}
-            className="gap-1.5"
-          >
-            <Crown className="h-4 w-4" />
-            <span className="hidden md:inline">프리미엄</span>
-          </Button>
-        </div>
-      </header>
+          </>
+        }
+      />
+
+      <div className="flex h-11 shrink-0 items-center gap-3 border-b bg-background/60 px-4">
+        <PortSelector value={area} onChange={(v) => setArea(v as Area)} />
+        <span className="text-xs text-muted-foreground hidden sm:inline-flex items-center gap-1">
+          <Clock className="h-3 w-3" /> {updatedText}
+        </span>
+      </div>
 
       <main className="flex flex-1 overflow-hidden">
         <div className="relative flex-1">
@@ -143,7 +126,7 @@ export default function DashboardPage() {
           </SheetTrigger>
           <SheetContent side="bottom" className="h-[75vh] p-0">
             <SheetHeader className="border-b px-4 py-3">
-              <SheetTitle>AI 해양 에이전트</SheetTitle>
+              <SheetTitle>AI Maritime Agent</SheetTitle>
             </SheetHeader>
             <div className="h-[calc(75vh-60px)] overflow-hidden">
               <AgentAlertPanel
@@ -168,16 +151,16 @@ export default function DashboardPage() {
 
       <footer className="flex h-12 shrink-0 items-center gap-4 border-t bg-background/80 px-4 text-xs text-muted-foreground backdrop-blur">
         <span className="inline-flex items-center gap-1.5">
-          <Ship className="h-3.5 w-3.5 text-primary" /> 모니터링 <strong className="text-foreground">{ships.length}</strong>척
+          <Ship className="h-3.5 w-3.5 text-primary" /> Monitoring <strong className="text-foreground">{ships.length}</strong> vessels
         </span>
         <span className="hidden sm:inline-flex items-center gap-1.5">
-          <AlertTriangle className="h-3.5 w-3.5 text-warning" /> 이상 <strong className="text-foreground">{alerts.length}</strong>건
+          <AlertTriangle className="h-3.5 w-3.5 text-warning" /> <strong className="text-foreground">{alerts.length}</strong> alerts
         </span>
         <span className="hidden sm:inline-flex items-center gap-1.5">
-          <Waves className="h-3.5 w-3.5 text-primary" /> 파고 <strong className="text-foreground">{waveText}</strong>
+          <Waves className="h-3.5 w-3.5 text-primary" /> Wave <strong className="text-foreground">{waveText}</strong>
         </span>
         <span className="ml-auto inline-flex items-center gap-1.5">
-          <Clock className="h-3.5 w-3.5" /> 업데이트 {updatedText}
+          <Clock className="h-3.5 w-3.5" /> Updated {updatedText}
         </span>
       </footer>
 
