@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const areaParam = (url.searchParams.get('area') || 'busan').toLowerCase();
-  const area: Area = areaParam === 'incheon' ? 'incheon' : 'busan';
+  const area: Area = areaParam;
 
   const hasKey = !!process.env.AISSTREAM_API_KEY;
   if (hasKey) {

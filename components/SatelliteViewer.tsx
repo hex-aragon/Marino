@@ -32,19 +32,19 @@ const DATA_SOURCES = [
     href: 'https://worldview.earthdata.nasa.gov',
   },
   {
-    name: 'Korea Ocean Satellite Center (NOSC)',
-    desc: 'GEO-KOMPSAT-2B GOCI-II imagery of Korean waters',
-    href: 'https://kosc.kiost.ac.kr',
-  },
-  {
-    name: 'Ministry of Oceans & Fisheries',
-    desc: 'Public port and maritime statistics, plus navigational safety information',
-    href: 'https://www.mof.go.kr',
+    name: 'NOAA (National Oceanic and Atmospheric Administration)',
+    desc: 'Global ocean currents, sea surface temperature, and marine forecasts',
+    href: 'https://www.noaa.gov/',
   },
   {
     name: 'Copernicus Marine',
     desc: 'ESA marine environment data (salinity, sea temperature, currents)',
     href: 'https://marine.copernicus.eu',
+  },
+  {
+    name: 'IMO (International Maritime Organization)',
+    desc: 'Global maritime safety and security regulations and shipping statistics',
+    href: 'https://www.imo.org/',
   },
 ];
 
