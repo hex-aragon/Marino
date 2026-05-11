@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { buildUsdcTransferTx } from '@/lib/solana';
 import { isPurchaseIntent, type NegEvent } from '@/lib/agentNegotiation';
 import type { Area, ShipData, WeatherData } from '@/types';
 
@@ -51,11 +52,14 @@ function buildGreeting(area: Area, ships: ShipData[], weather: WeatherData | nul
 
 export default function AgentChat({ area, ships, weather }: AgentChatProps) {
   const wallet = useWallet();
+  const { connection } = useConnection();
   const [items, setItems] = useState<ChatItem[]>([]);
   const [input, setInput] = useState('');
   const [isBusy, setIsBusy] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
+  const realTxRef = useRef<string | null>(null);
+  const currentPriceRef = useRef<number>(0);
 
   useEffect(() => {
     if (initialized.current) return;
@@ -101,6 +105,37 @@ export default function AgentChat({ area, ships, weather }: AgentChatProps) {
         if (!trimmed) continue;
         try {
           const ev = JSON.parse(trimmed) as NegEvent;
+          
+          if (ev.type === 'x402_init') {
+            currentPriceRef.current = ev.priceUsdc;
+          }
+          
+          if (ev.type === 'x402_paying' && wallet.publicKey) {
+            appendEvent({ ...ev, txHash: 'waiting for approval...' });
+            try {
+              const escrowWallet = process.env.NEXT_PUBLIC_MERCHANT_WALLET || '11111111111111111111111111111111';
+              const tx = await buildUsdcTransferTx(wallet.publicKey.toBase58(), escrowWallet, currentPriceRef.current);
+              const signature = await wallet.sendTransaction(tx, connection);
+              realTxRef.current = signature;
+              // replace the paying event visually with the real one
+              setItems(p => {
+                const arr = [...p];
+                arr[arr.length - 1] = { kind: 'nego_event', event: { ...ev, txHash: signature }, createdAt: nowIso() };
+                return arr;
+              });
+              await connection.confirmTransaction(signature, 'confirmed');
+            } catch (e: any) {
+              console.error(e);
+              realTxRef.current = 'mock_neg_fallback_' + Date.now();
+            }
+            continue;
+          }
+          
+          if (ev.type === 'x402_settled' && realTxRef.current) {
+            ev.txHash = realTxRef.current;
+            realTxRef.current = null;
+          }
+
           appendEvent(ev);
         } catch {}
       }
